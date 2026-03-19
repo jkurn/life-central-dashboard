@@ -299,6 +299,100 @@
     transition: width 0.4s ease;
   }
 
+  /* ── PROJECT TABLE ── */
+  .project-table {
+    width: 100%; border-collapse: collapse;
+    font-size: 0.8rem;
+  }
+  .project-table th {
+    text-align: left; padding: 0.6rem 0.75rem;
+    font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--text-muted);
+    border-bottom: 2px solid var(--border); background: rgba(0,128,128,0.03);
+  }
+  .project-table td {
+    padding: 0.55rem 0.75rem; border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .project-table tr:hover td { background: var(--teal-bg); }
+  .project-table .proj-name { font-weight: 600; color: var(--text); white-space: nowrap; }
+  .project-table .proj-stack { font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono); }
+
+  .status-pill {
+    display: inline-block; padding: 2px 8px; border-radius: 12px;
+    font-size: 0.68rem; font-weight: 600; white-space: nowrap;
+  }
+  .status-pill.active { background: #dcfce7; color: #166534; }
+  .status-pill.in-progress { background: #dbeafe; color: #1e40af; }
+  .status-pill.blocked { background: #fef3c7; color: #92400e; }
+  .status-pill.stalled { background: #f3f4f6; color: #6b7280; }
+  .status-pill.complete { background: #e0e7ff; color: #3730a3; }
+
+  .type-pill {
+    display: inline-block; padding: 1px 6px; border-radius: 3px;
+    font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.04em; background: var(--teal-bg); color: var(--teal);
+    border: 1px solid var(--teal-border);
+  }
+  .type-pill.agent { background: #faf5ff; color: #7c3aed; border-color: #ddd6fe; }
+  .type-pill.client { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
+  .type-pill.personal { background: #f0fdf4; color: #166534; border-color: #bbf7d0; }
+
+  /* ── COST TABLE ── */
+  .cost-table {
+    width: 100%; border-collapse: collapse; font-size: 0.8rem;
+  }
+  .cost-table th {
+    text-align: left; padding: 0.5rem 0.75rem;
+    font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--text-muted);
+    border-bottom: 2px solid var(--border); background: rgba(0,128,128,0.03);
+  }
+  .cost-table th:last-child, .cost-table td:last-child { text-align: right; }
+  .cost-table td {
+    padding: 0.45rem 0.75rem; border-bottom: 1px solid var(--border);
+  }
+  .cost-table tr:hover td { background: var(--teal-bg); }
+  .cost-table .cost-val {
+    font-family: var(--font-mono); font-weight: 600; font-size: 0.82rem;
+  }
+  .cost-table .cost-val.high { color: #dc2626; }
+  .cost-table .cost-val.med { color: #d97706; }
+  .cost-table .cost-val.low { color: #16a34a; }
+
+  .cost-summary {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem; margin-bottom: 1.25rem;
+  }
+  .cost-kpi {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 0.75rem 1rem;
+    text-align: center;
+  }
+  .cost-kpi .kpi-label {
+    font-size: 0.68rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 0.25rem;
+  }
+  .cost-kpi .kpi-value {
+    font-size: 1.3rem; font-weight: 800; color: var(--teal);
+    font-family: var(--font-mono); letter-spacing: -0.02em;
+  }
+  .cost-kpi .kpi-sub {
+    font-size: 0.7rem; color: var(--text-muted); margin-top: 0.15rem;
+  }
+
+  .editable-inline {
+    border: none; border-bottom: 1px dashed var(--teal-border);
+    background: transparent; font-family: var(--font-mono);
+    font-size: 0.82rem; font-weight: 600; color: var(--teal-dark);
+    width: 80px; text-align: right; padding: 0 2px;
+    outline: none;
+  }
+  .editable-inline:focus {
+    border-bottom-color: var(--teal); border-bottom-style: solid;
+    background: var(--teal-bg);
+  }
+
   /* ── QUOTE ── */
   .quote-block {
     border-left: 3px solid var(--teal);
@@ -432,15 +526,17 @@
 <nav class="top-nav">
   <div class="nav-inner">
     <span class="nav-brand">Life Central</span>
+    <a href="#projects" class="nav-link" style="font-weight:700;">Projects</a>
+    <a href="#costs" class="nav-link" style="font-weight:700;">Costs</a>
     <a href="#vision" class="nav-link">Vision</a>
-    <a href="#deep-life-stack" class="nav-link">Deep Life Stack</a>
-    <a href="#buckets" class="nav-link">Life Buckets</a>
-    <a href="#values" class="nav-link">Values & Code</a>
-    <a href="#multi-scale" class="nav-link">Multi-Scale Planning</a>
-    <a href="#productivity" class="nav-link">Productivity Funnel</a>
-    <a href="#time-block" class="nav-link">Time Blocking</a>
-    <a href="#habits" class="nav-link">Keystone Habits</a>
-    <a href="#shutdown" class="nav-link">Shutdown Ritual</a>
+    <a href="#deep-life-stack" class="nav-link">Stack</a>
+    <a href="#buckets" class="nav-link">Buckets</a>
+    <a href="#values" class="nav-link">Values</a>
+    <a href="#multi-scale" class="nav-link">Planning</a>
+    <a href="#productivity" class="nav-link">Funnel</a>
+    <a href="#time-block" class="nav-link">Time Block</a>
+    <a href="#habits" class="nav-link">Habits</a>
+    <a href="#shutdown" class="nav-link">Shutdown</a>
     <div class="nav-user" id="nav-user">
       <span class="sync-status local" id="sync-indicator">LOCAL</span>
       <span class="nav-user-email" id="user-email"></span>
@@ -457,6 +553,301 @@
   <p>A complete implementation of Cal Newport's Deep Life philosophy — from vision to daily execution.</p>
   <span class="hero-subtitle">Deep Life Stack v2.0 + Multi-Scale Planning + Slow Productivity</span>
   <p class="print-timestamp" id="print-ts"></p>
+</div>
+
+<!-- ═══ PROJECT COMMAND ═══ -->
+<div class="section" id="projects">
+  <div class="section-header" onclick="toggleSection(this)">
+    <h2>Project Command</h2>
+    <span class="section-badge">15 Projects</span>
+    <span class="section-toggle">&#9660;</span>
+  </div>
+  <div class="section-body">
+    <div class="cost-summary" style="margin-bottom: 1.25rem;">
+      <div class="cost-kpi">
+        <div class="kpi-label">Active</div>
+        <div class="kpi-value" id="proj-active">8</div>
+        <div class="kpi-sub">in progress</div>
+      </div>
+      <div class="cost-kpi">
+        <div class="kpi-label">Complete</div>
+        <div class="kpi-value" style="color: #16a34a;" id="proj-complete">5</div>
+        <div class="kpi-sub">shipped</div>
+      </div>
+      <div class="cost-kpi">
+        <div class="kpi-label">Blocked</div>
+        <div class="kpi-value" style="color: #d97706;" id="proj-blocked">0</div>
+        <div class="kpi-sub">needs attention</div>
+      </div>
+      <div class="cost-kpi">
+        <div class="kpi-label">Stalled</div>
+        <div class="kpi-value" style="color: #6b7280;" id="proj-stalled">2</div>
+        <div class="kpi-sub">no recent activity</div>
+      </div>
+    </div>
+
+    <div class="card" style="padding: 0; overflow-x: auto;">
+      <table class="project-table" id="project-table">
+        <thead>
+          <tr>
+            <th>Project</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Stack</th>
+            <th>Next Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="proj-name">Nielsen Bot</td>
+            <td><span class="type-pill client">Client</span></td>
+            <td><span class="status-pill active">Active</span></td>
+            <td class="proj-stack">Python, Claude API</td>
+            <td><input data-key="proj-nielsen-next" placeholder="Fix hallucination + retrieval" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
+          </tr>
+          <tr>
+            <td class="proj-name">Paperclip</td>
+            <td><span class="type-pill agent">Agent</span></td>
+            <td><span class="status-pill in-progress">In Progress</span></td>
+            <td class="proj-stack">Node/TS, PostgreSQL</td>
+            <td><input data-key="proj-paperclip-next" placeholder="Multi-agent orchestration" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
+          </tr>
+          <tr>
+            <td class="proj-name">NanoClaw</td>
+            <td><span class="type-pill agent">Agent</span></td>
+            <td><span class="status-pill active">Active</span></td>
+            <td class="proj-stack">Node/TS, SQLite, Docker</td>
+            <td><input data-key="proj-nanoclaw-next" placeholder="WhatsApp + Telegram live" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
+          </tr>
+          <tr>
+            <td class="proj-name">Twitter Bookmark Agent</td>
+            <td><span class="type-pill agent">Agent</span></td>
+            <td><span class="status-pill active">Active</span></td>
+            <td class="proj-stack">Python, Lambda, Pinecone</td>
+            <td><input data-key="proj-twitter-next" placeholder="RAG chatbot via Telegram" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
+          </tr>
+          <tr>
+            <td class="proj-name">Strator / MedNex</td>
+            <td><span class="type-pill client">Client</span></td>
+            <td><span class="status-pill in-progress">In Progress</span></td>
+            <td class="proj-stack">Python, Claude Sonnet</td>
+            <td><input data-key="proj-strator-next" placeholder="Clarify role w/ Kevin" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
+          </tr>
+          <tr>
+            <td class="proj-name">Carer Liaison</td>
+            <td><span class="type-pill agent">Agent</span></td>
+            <td><span class="status-pill in-progress">In Progress</span></td>
+            <td class="proj-stack">Python, Claude, Obsidian</td>
+            <td><input data-key="proj-carer-next" placeholder="6-agent NDIS system" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
+          </tr>
+          <tr>
+            <td class="proj-name">VoiceNote Pipeline</td>
+            <td><span class="type-pill agent">Agent</span></td>
+            <td><span class="status-pill active">Active</span></td>
+            <td class="proj-stack">Python, Deepgram, OpenRouter</td>
+            <td><input data-key="proj-voice-next" placeholder="Voice → Obsidian notes" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
+          </tr>
+          <tr>
+            <td class="proj-name">Video (Remotion)</td>
+            <td><span class="type-pill">Product</span></td>
+            <td><span class="status-pill active">Active</span></td>
+            <td class="proj-stack">Next.js, React, Remotion</td>
+            <td><input data-key="proj-video-next" placeholder="Prompt → motion graphics" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
+          </tr>
+          <tr>
+            <td class="proj-name">buildpersonalbranding.com</td>
+            <td><span class="type-pill personal">Business</span></td>
+            <td><span class="status-pill blocked">Blocked</span></td>
+            <td class="proj-stack">TBD — $8K + $2.5K/mo</td>
+            <td><input data-key="proj-bpb-next" placeholder="10 PRD questions outstanding" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
+          </tr>
+          <tr>
+            <td class="proj-name">Personal Website</td>
+            <td><span class="type-pill personal">Personal</span></td>
+            <td><span class="status-pill complete">Complete</span></td>
+            <td class="proj-stack">HTML/CSS/JS, GitHub Pages</td>
+            <td><input data-key="proj-site-next" placeholder="Spec locked, needs content" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
+          </tr>
+          <tr>
+            <td class="proj-name">Life Central Dashboard</td>
+            <td><span class="type-pill personal">Personal</span></td>
+            <td><span class="status-pill active">Active</span></td>
+            <td class="proj-stack">HTML/JS, Supabase, GH Pages</td>
+            <td><input data-key="proj-dashboard-next" placeholder="v1.1 — projects + costs" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
+          </tr>
+          <tr>
+            <td class="proj-name">Claude Chat Analysis</td>
+            <td><span class="type-pill">Research</span></td>
+            <td><span class="status-pill complete">Complete</span></td>
+            <td class="proj-stack">Python, D3.js, NLP</td>
+            <td><input data-key="proj-analysis-next" placeholder="Scrollytelling visualization done" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
+          </tr>
+          <tr>
+            <td class="proj-name">Autonomous Agent Gallery</td>
+            <td><span class="type-pill">Showcase</span></td>
+            <td><span class="status-pill complete">Complete</span></td>
+            <td class="proj-stack">React, Vite, Tailwind</td>
+            <td><input data-key="proj-gallery-next" placeholder="33 OpenClaw use cases" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
+          </tr>
+          <tr>
+            <td class="proj-name">Software Foundry</td>
+            <td><span class="type-pill agent">Agent</span></td>
+            <td><span class="status-pill in-progress">In Progress</span></td>
+            <td class="proj-stack">Protocol / Framework</td>
+            <td><input data-key="proj-foundry-next" placeholder="Multi-agent roles defined" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
+          </tr>
+          <tr>
+            <td class="proj-name">Bridge AI FZCO</td>
+            <td><span class="type-pill">Admin</span></td>
+            <td><span class="status-pill blocked">Blocked</span></td>
+            <td class="proj-stack">UAE liquidation</td>
+            <td><input data-key="proj-bridge-next" placeholder="Blocked on FTA docs" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
+          </tr>
+          <tr>
+            <td class="proj-name">jkurn-profile (Next.js)</td>
+            <td><span class="type-pill personal">Personal</span></td>
+            <td><span class="status-pill stalled">Stalled</span></td>
+            <td class="proj-stack">Next.js, React, TS</td>
+            <td><input data-key="proj-jkurn-next" placeholder="Scaffold only — superseded?" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
+          </tr>
+          <tr>
+            <td class="proj-name">WhatsApp Agent</td>
+            <td><span class="type-pill agent">Agent</span></td>
+            <td><span class="status-pill stalled">Stalled</span></td>
+            <td class="proj-stack">Placeholder</td>
+            <td><input data-key="proj-wa-next" placeholder="Empty repo — merge into NanoClaw?" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top: 0.75rem; font-size: 0.72rem; color: var(--text-muted);">
+      Edit "Next Action" fields inline. All changes auto-save.
+    </div>
+  </div>
+</div>
+
+<!-- ═══ COST CENTER ═══ -->
+<div class="section" id="costs">
+  <div class="section-header" onclick="toggleSection(this)">
+    <h2>Cost Center</h2>
+    <span class="section-badge">Monthly Spend</span>
+    <span class="section-toggle">&#9660;</span>
+  </div>
+  <div class="section-body">
+    <div class="cost-summary">
+      <div class="cost-kpi">
+        <div class="kpi-label">Total Monthly</div>
+        <div class="kpi-value" id="cost-total">$0</div>
+        <div class="kpi-sub">all services</div>
+      </div>
+      <div class="cost-kpi">
+        <div class="kpi-label">AI / LLM APIs</div>
+        <div class="kpi-value" id="cost-ai">$0</div>
+        <div class="kpi-sub">Claude, OpenRouter, Deepgram</div>
+      </div>
+      <div class="cost-kpi">
+        <div class="kpi-label">Infrastructure</div>
+        <div class="kpi-value" id="cost-infra">$0</div>
+        <div class="kpi-sub">AWS, Pinecone, hosting</div>
+      </div>
+      <div class="cost-kpi">
+        <div class="kpi-label">Monthly Budget</div>
+        <div class="kpi-value" style="color: var(--text);" id="cost-budget">$200</div>
+        <div class="kpi-sub">target ceiling</div>
+      </div>
+    </div>
+
+    <div class="card" style="padding: 0; overflow-x: auto;">
+      <table class="cost-table" id="cost-table">
+        <thead>
+          <tr>
+            <th>Service</th>
+            <th>Category</th>
+            <th>Used By</th>
+            <th>Pricing Model</th>
+            <th>Monthly Est.</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight: 600;">Anthropic (Claude API)</td>
+            <td>AI / LLM</td>
+            <td style="font-size: 0.75rem;">Paperclip, NanoClaw, Nielsen, MedNex, Carer Liaison</td>
+            <td style="font-size: 0.75rem;">Per-token</td>
+            <td><input class="editable-inline cost-input" data-key="cost-claude" data-category="ai" placeholder="0.00"></td>
+          </tr>
+          <tr>
+            <td style="font-weight: 600;">OpenRouter</td>
+            <td>AI / LLM</td>
+            <td style="font-size: 0.75rem;">VoiceNote Pipeline</td>
+            <td style="font-size: 0.75rem;">Per-token (Gemini/Claude)</td>
+            <td><input class="editable-inline cost-input" data-key="cost-openrouter" data-category="ai" placeholder="0.00"></td>
+          </tr>
+          <tr>
+            <td style="font-weight: 600;">Deepgram</td>
+            <td>AI / LLM</td>
+            <td style="font-size: 0.75rem;">VoiceNote Pipeline</td>
+            <td style="font-size: 0.75rem;">$0.0043/min (Nova-2)</td>
+            <td><input class="editable-inline cost-input" data-key="cost-deepgram" data-category="ai" placeholder="0.00"></td>
+          </tr>
+          <tr>
+            <td style="font-weight: 600;">AWS Lambda</td>
+            <td>Infrastructure</td>
+            <td style="font-size: 0.75rem;">Twitter Bookmark Agent</td>
+            <td style="font-size: 0.75rem;">Pay-per-invocation</td>
+            <td><input class="editable-inline cost-input" data-key="cost-aws" data-category="infra" placeholder="0.00"></td>
+          </tr>
+          <tr>
+            <td style="font-weight: 600;">Pinecone</td>
+            <td>Infrastructure</td>
+            <td style="font-size: 0.75rem;">Twitter Bookmark Agent</td>
+            <td style="font-size: 0.75rem;">$0.10/1M vectors + queries</td>
+            <td><input class="editable-inline cost-input" data-key="cost-pinecone" data-category="infra" placeholder="0.00"></td>
+          </tr>
+          <tr>
+            <td style="font-weight: 600;">Supabase</td>
+            <td>Infrastructure</td>
+            <td style="font-size: 0.75rem;">Life Central Dashboard</td>
+            <td style="font-size: 0.75rem;">Free tier / $25 Pro</td>
+            <td><input class="editable-inline cost-input" data-key="cost-supabase" data-category="infra" placeholder="0.00"></td>
+          </tr>
+          <tr>
+            <td style="font-weight: 600;">GitHub Pages</td>
+            <td>Infrastructure</td>
+            <td style="font-size: 0.75rem;">Dashboard, Personal Site, Gallery</td>
+            <td style="font-size: 0.75rem;">Free</td>
+            <td><input class="editable-inline cost-input" data-key="cost-ghpages" data-category="infra" value="0.00" placeholder="0.00"></td>
+          </tr>
+          <tr>
+            <td style="font-weight: 600;">Vercel</td>
+            <td>Infrastructure</td>
+            <td style="font-size: 0.75rem;">Video (Remotion)</td>
+            <td style="font-size: 0.75rem;">Free tier / Pro</td>
+            <td><input class="editable-inline cost-input" data-key="cost-vercel" data-category="infra" placeholder="0.00"></td>
+          </tr>
+          <tr>
+            <td style="font-weight: 600;">Replit</td>
+            <td>Infrastructure</td>
+            <td style="font-size: 0.75rem;">Strator / MedNex</td>
+            <td style="font-size: 0.75rem;">Free tier</td>
+            <td><input class="editable-inline cost-input" data-key="cost-replit" data-category="infra" placeholder="0.00"></td>
+          </tr>
+          <tr>
+            <td style="font-weight: 600;">Claude Code (Subscription)</td>
+            <td>Tools</td>
+            <td style="font-size: 0.75rem;">All development</td>
+            <td style="font-size: 0.75rem;">Monthly subscription</td>
+            <td><input class="editable-inline cost-input" data-key="cost-claudecode" data-category="ai" placeholder="0.00"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top: 1rem;">
+      <div class="editable-label">Cost Notes & Observations</div>
+      <textarea class="editable" data-key="cost-notes" style="min-height: 60px;" placeholder="Track anomalies, spikes, budget decisions here..."></textarea>
+    </div>
+  </div>
 </div>
 
 <!-- 1. LIFESTYLE-CENTRIC VISION -->
@@ -1157,6 +1548,49 @@ function handlePrint() {
   window.print();
 }
 
+// ═══ COST CALCULATIONS ═══
+function updateCostTotals() {
+  let aiTotal = 0, infraTotal = 0;
+  document.querySelectorAll('.cost-input').forEach(input => {
+    const val = parseFloat(input.value) || 0;
+    if (input.dataset.category === 'ai') aiTotal += val;
+    else if (input.dataset.category === 'infra') infraTotal += val;
+  });
+  const total = aiTotal + infraTotal;
+  document.getElementById('cost-total').textContent = '$' + total.toFixed(0);
+  document.getElementById('cost-ai').textContent = '$' + aiTotal.toFixed(0);
+  document.getElementById('cost-infra').textContent = '$' + infraTotal.toFixed(0);
+
+  // Color the total based on budget
+  const budgetEl = document.getElementById('cost-budget');
+  const budget = parseFloat(budgetEl.textContent.replace('$', '')) || 200;
+  const totalEl = document.getElementById('cost-total');
+  if (total > budget) totalEl.style.color = '#dc2626';
+  else if (total > budget * 0.8) totalEl.style.color = '#d97706';
+  else totalEl.style.color = '#16a34a';
+}
+
+// ═══ PROJECT STATUS COUNTS ═══
+function updateProjectCounts() {
+  const pills = document.querySelectorAll('#project-table .status-pill');
+  let active = 0, complete = 0, blocked = 0, stalled = 0;
+  pills.forEach(p => {
+    const text = p.textContent.trim();
+    if (text === 'Active') active++;
+    else if (text === 'In Progress') active++;
+    else if (text === 'Complete') complete++;
+    else if (text === 'Blocked') blocked++;
+    else if (text === 'Stalled') stalled++;
+  });
+  document.getElementById('proj-active').textContent = active;
+  document.getElementById('proj-complete').textContent = complete;
+  document.getElementById('proj-blocked').textContent = blocked;
+  document.getElementById('proj-stalled').textContent = stalled;
+}
+
+// Run on load
+setTimeout(() => { updateCostTotals(); updateProjectCounts(); }, 500);
+
 // ═══ AUTO-SAVE ON CHANGE ═══
 document.addEventListener('change', (e) => {
   if (e.target.dataset?.key) {
@@ -1167,6 +1601,7 @@ document.addEventListener('change', (e) => {
 document.addEventListener('input', (e) => {
   if (e.target.dataset?.key && e.target.type !== 'checkbox') {
     DashboardData.debouncedSave();
+    if (e.target.classList.contains('cost-input')) updateCostTotals();
   }
 });
 </script>
