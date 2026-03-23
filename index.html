@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Life Central Planning Dashboard — Cal Newport System</title>
+<title>Life Central</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
     --teal: #008080;
@@ -13,16 +16,24 @@
     --teal-border: rgba(0, 128, 128, 0.2);
     --bg: #F6F5EF;
     --bg-card: #FFFFFF;
+    --bg-sidebar: #FAFAF7;
     --text: #1a1a1a;
     --text-secondary: #555;
     --text-muted: #888;
     --border: #e0ddd5;
     --shadow: 0 1px 3px rgba(0,0,0,0.06);
-    --shadow-hover: 0 4px 12px rgba(0,128,128,0.12);
+    --shadow-hover: 0 4px 12px rgba(0,128,128,0.10);
     --radius: 10px;
     --radius-sm: 6px;
     --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+    --sidebar-w: 220px;
+    --topbar-h: 52px;
+    --green: #16a34a;
+    --amber: #d97706;
+    --red: #dc2626;
+    --blue: #2563eb;
+    --purple: #7c3aed;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -33,1403 +44,1129 @@
     color: var(--text);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+    height: 100vh;
+    overflow: hidden;
   }
 
-  /* ── NAV ── */
-  .top-nav {
-    position: sticky; top: 0; z-index: 100;
-    background: rgba(246,245,239,0.92);
-    backdrop-filter: blur(12px);
+  /* ═══ SHELL LAYOUT ═══ */
+  .shell {
+    display: grid;
+    grid-template-columns: var(--sidebar-w) 1fr;
+    grid-template-rows: var(--topbar-h) 1fr;
+    height: 100vh;
+  }
+
+  /* ═══ TOP BAR ═══ */
+  .topbar {
+    grid-column: 1 / -1;
+    background: var(--bg-card);
     border-bottom: 1px solid var(--border);
-    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    padding: 0 1.5rem;
+    gap: 1.5rem;
+    z-index: 10;
   }
-  .nav-inner {
-    max-width: 1400px; margin: 0 auto;
-    display: flex; align-items: center; gap: 1rem;
-    height: 56px; overflow-x: auto;
+  .topbar-brand {
+    font-weight: 800;
+    font-size: 1rem;
+    color: var(--teal);
+    letter-spacing: -0.03em;
   }
-  .nav-brand {
-    font-weight: 700; font-size: 0.95rem; color: var(--teal);
-    white-space: nowrap; margin-right: 1rem;
-    letter-spacing: -0.02em;
-  }
-  .nav-link {
-    font-size: 0.8rem; color: var(--text-secondary);
-    text-decoration: none; white-space: nowrap;
-    padding: 6px 10px; border-radius: var(--radius-sm);
-    transition: all 0.2s;
+  .topbar-date {
+    font-size: 0.78rem;
+    color: var(--text-muted);
     font-weight: 500;
   }
-  .nav-link:hover, .nav-link.active {
-    color: var(--teal); background: var(--teal-bg);
+  .topbar-spacer { flex: 1; }
+  .topbar-sync {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 3px;
   }
-  .nav-user {
-    margin-left: auto;
-    display: flex; align-items: center; gap: 0.75rem;
-    white-space: nowrap; flex-shrink: 0;
+  .topbar-sync.local { color: var(--amber); background: #fffbeb; }
+  .topbar-sync.synced { color: var(--green); background: #f0fdf4; }
+  .topbar-user {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
-  .nav-user-email {
-    font-size: 0.75rem; color: var(--text-muted);
-    max-width: 180px; overflow: hidden; text-overflow: ellipsis;
-  }
-  .nav-user-btn {
-    font-size: 0.72rem; font-weight: 600;
-    padding: 4px 10px; border-radius: 4px;
+  .topbar-btn {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 4px;
     border: 1px solid var(--teal-border);
-    background: var(--teal-bg); color: var(--teal);
-    cursor: pointer; transition: all 0.2s;
+    background: var(--teal-bg);
+    color: var(--teal);
+    cursor: pointer;
     text-decoration: none;
+    transition: background-color 0.15s, color 0.15s;
   }
-  .nav-user-btn:hover { background: var(--teal); color: white; }
+  .topbar-btn:hover { background: var(--teal); color: white; }
 
-  /* ── LAYOUT ── */
-  .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
-
-  .hero {
-    text-align: center; padding: 3rem 1rem 2rem;
+  /* ═══ SIDEBAR ═══ */
+  .sidebar {
+    background: var(--bg-sidebar);
+    border-right: 1px solid var(--border);
+    padding: 1rem 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
   }
-  .hero h1 {
-    font-size: 2.2rem; font-weight: 800; color: var(--teal);
-    letter-spacing: -0.03em; margin-bottom: 0.5rem;
+  .sidebar-section {
+    padding: 0 0.75rem;
+    margin-bottom: 1.25rem;
   }
-  .hero p {
-    font-size: 1rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto;
+  .sidebar-label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    padding: 0 0.75rem;
+    margin-bottom: 0.4rem;
   }
-  .hero-subtitle {
-    display: inline-block; margin-top: 0.75rem;
-    font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
-    letter-spacing: 0.1em; color: var(--teal);
-    background: var(--teal-bg); padding: 4px 12px; border-radius: 20px;
-    border: 1px solid var(--teal-border);
-  }
-
-  /* ── SECTIONS ── */
-  .section {
-    margin-bottom: 3rem;
-    scroll-margin-top: 70px;
-  }
-  .section-header {
-    display: flex; align-items: center; gap: 0.75rem;
-    margin-bottom: 1.25rem; cursor: pointer;
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: background-color 0.15s, color 0.15s;
     user-select: none;
+    min-height: 36px;
   }
-  .section-header h2 {
-    font-size: 1.3rem; font-weight: 700; color: var(--text);
-    letter-spacing: -0.02em;
+  .sidebar-item:hover {
+    background: var(--teal-bg);
+    color: var(--teal);
   }
-  .section-badge {
-    font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
-    letter-spacing: 0.08em; color: var(--teal); background: var(--teal-bg);
-    padding: 3px 8px; border-radius: 4px; border: 1px solid var(--teal-border);
+  .sidebar-item.active {
+    background: var(--teal);
+    color: white;
   }
-  .section-toggle {
-    margin-left: auto; font-size: 1.2rem; color: var(--text-muted);
-    transition: transform 0.3s;
+  .sidebar-item .icon {
+    width: 18px;
+    text-align: center;
+    font-size: 0.9rem;
+    flex-shrink: 0;
   }
-  .section-toggle.collapsed { transform: rotate(-90deg); }
-  .section-body { transition: max-height 0.4s ease, opacity 0.3s; overflow: hidden; }
-  .section-body.collapsed { max-height: 0 !important; opacity: 0; }
+  .sidebar-item .badge {
+    margin-left: auto;
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 10px;
+    background: var(--teal-bg);
+    color: var(--teal);
+  }
+  .sidebar-item.active .badge {
+    background: rgba(255,255,255,0.25);
+    color: white;
+  }
+  .sidebar-spacer { flex: 1; }
+  .sidebar-footer {
+    padding: 0.75rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 0.4rem;
+  }
+  .sidebar-footer-btn {
+    flex: 1;
+    padding: 0.4rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-card);
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    text-align: center;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .sidebar-footer-btn:hover {
+    border-color: var(--teal);
+    color: var(--teal);
+  }
 
-  /* ── CARDS ── */
+  /* ═══ MAIN CONTENT ═══ */
+  .main {
+    overflow-y: auto;
+    padding: 1.5rem 2rem;
+    scroll-behavior: smooth;
+  }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .panel-header {
+    margin-bottom: 1.5rem;
+  }
+  .panel-header h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.03em;
+  }
+  .panel-header p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+  }
+
+  /* ═══ SHARED COMPONENTS ═══ */
+
+  /* Cards */
   .card {
-    background: var(--bg-card); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 1.5rem;
-    box-shadow: var(--shadow); transition: box-shadow 0.2s;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.2s;
   }
   .card:hover { box-shadow: var(--shadow-hover); }
-  .card h3 {
-    font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem;
-    color: var(--text); letter-spacing: -0.01em;
+  .card-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.01em;
   }
-  .card p, .card li { font-size: 0.88rem; color: var(--text-secondary); }
-  .card ul { padding-left: 1.2rem; margin-top: 0.4rem; }
-  .card li { margin-bottom: 0.25rem; }
-
-  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.25rem; }
-  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; }
-  .grid-5 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
-
-  /* ── STACK VISUAL ── */
-  .stack-layers {
-    display: flex; flex-direction: column; gap: 0;
+  .card-subtitle {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
   }
+
+  /* Grids */
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; }
+
+  /* KPI cards */
+  .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem; }
+  .kpi {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.75rem 1rem;
+    text-align: center;
+  }
+  .kpi-label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+  }
+  .kpi-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--teal);
+    line-height: 1.2;
+    margin: 0.2rem 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .kpi-sub {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+  }
+
+  /* Editable fields */
+  .field-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--teal);
+    margin-bottom: 0.25rem;
+  }
+  .field {
+    width: 100%;
+    padding: 0.5rem 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: var(--font);
+    font-size: 0.82rem;
+    color: var(--text);
+    background: var(--bg);
+    resize: vertical;
+    line-height: 1.5;
+    transition: border-color 0.15s, background-color 0.15s;
+    min-height: 36px;
+  }
+  .field:focus {
+    outline: none;
+    border-color: var(--teal);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(0,128,128,0.08);
+  }
+  .field::placeholder { color: var(--text-muted); }
+  .field.compact { min-height: 28px; }
+  .field-group { margin-bottom: 0.75rem; }
+
+  /* Tables */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+  }
+  .data-table th {
+    text-align: left;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    padding: 0.5rem 0.75rem;
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+  }
+  .data-table td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-secondary);
+    vertical-align: middle;
+  }
+  .data-table tr:hover td { background: var(--teal-bg); }
+  .data-table td input {
+    border: none;
+    background: transparent;
+    font-family: var(--font);
+    font-size: 0.82rem;
+    color: var(--text);
+    width: 100%;
+    outline: none;
+  }
+
+  /* Tags */
+  .tag {
+    display: inline-block;
+    font-size: 0.6rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .tag-client { background: #fff7ed; color: #c2410c; }
+  .tag-agent { background: #f0fdf4; color: #166534; }
+  .tag-product { background: #eff6ff; color: #1e40af; }
+  .tag-business { background: #faf5ff; color: #5b21b6; }
+  .tag-personal { background: #f5f5f4; color: #57534e; }
+  .tag-research { background: #fef9c3; color: #92400e; }
+  .tag-showcase { background: #e0e7ff; color: #3730a3; }
+
+  /* Status */
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+  }
+  .status-active .status-dot { background: var(--green); }
+  .status-progress .status-dot { background: var(--blue); }
+  .status-blocked .status-dot { background: var(--red); }
+  .status-complete .status-dot { background: var(--text-muted); }
+  .status-stalled .status-dot { background: var(--amber); }
+
+  /* Tabs */
+  .tab-bar {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+  .tab-item {
+    flex: 1;
+    padding: 0.5rem;
+    text-align: center;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    border-right: 1px solid var(--border);
+    transition: background-color 0.15s, color 0.15s;
+    user-select: none;
+  }
+  .tab-item:last-child { border-right: none; }
+  .tab-item.active { background: var(--teal); color: white; }
+  .tab-item:hover:not(.active) { background: var(--teal-bg); color: var(--teal); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Quote */
+  .quote {
+    padding: 0.75rem 1rem;
+    background: var(--teal-bg);
+    border-radius: var(--radius-sm);
+    margin: 0.75rem 0;
+    font-size: 0.85rem;
+    font-style: italic;
+    color: var(--text-secondary);
+  }
+  .quote cite {
+    display: block;
+    font-size: 0.72rem;
+    font-style: normal;
+    font-weight: 600;
+    color: var(--teal);
+    margin-top: 0.3rem;
+  }
+
+  /* Habit grid */
+  .habit-grid {
+    display: grid;
+    grid-template-columns: 140px repeat(7, 1fr);
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--bg-card);
+    font-size: 0.78rem;
+  }
+  .habit-header {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.4rem;
+    text-align: center;
+    background: rgba(0,128,128,0.03);
+    border-bottom: 1px solid var(--border);
+  }
+  .habit-header:first-child { text-align: left; padding-left: 0.6rem; }
+  .habit-name {
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.35rem 0.6rem;
+    border-bottom: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .habit-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .habit-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.3rem;
+    border-bottom: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    min-height: 32px;
+  }
+  .habit-cell:nth-child(8n) { border-right: none; }
+  .habit-cell input[type="checkbox"] {
+    accent-color: var(--teal);
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+  }
+  .progress-bar {
+    height: 5px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--teal);
+    border-radius: 3px;
+    transition: width 0.3s;
+  }
+
+  /* Time grid */
+  .time-grid {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--bg-card);
+  }
+  .time-slot {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    padding: 0.3rem 0.5rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(0,128,128,0.02);
+    text-align: right;
+    font-family: var(--font-mono);
+  }
+  .time-block {
+    padding: 0.3rem 0.5rem;
+    border-bottom: 1px solid var(--border);
+    min-height: 28px;
+  }
+  .time-block input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-family: var(--font);
+    font-size: 0.78rem;
+    color: var(--text);
+    outline: none;
+  }
+  .time-block input::placeholder { color: var(--text-muted); }
+  .time-block.deep { background: rgba(0,128,128,0.06); }
+  .time-block.shallow { background: rgba(200,180,80,0.06); }
+
+  /* Stack layers */
+  .stack-layers { display: flex; flex-direction: column; gap: 0; }
   .stack-layer {
-    background: var(--bg-card); border: 1px solid var(--border);
-    padding: 1.25rem 1.5rem; position: relative;
-    transition: all 0.2s;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 1rem 1.25rem 1rem 2.5rem;
+    position: relative;
+    transition: background-color 0.15s;
   }
   .stack-layer:first-child { border-radius: var(--radius) var(--radius) 0 0; }
   .stack-layer:last-child { border-radius: 0 0 var(--radius) var(--radius); }
   .stack-layer:not(:last-child) { border-bottom: none; }
   .stack-layer:hover { background: var(--teal-bg); }
-  .stack-layer .layer-number {
-    position: absolute; left: -12px; top: 50%; transform: translateY(-50%);
-    width: 24px; height: 24px; border-radius: 50%;
-    background: var(--teal); color: white; font-size: 0.7rem;
-    font-weight: 700; display: flex; align-items: center; justify-content: center;
+  .stack-num {
+    position: absolute;
+    left: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--teal);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .stack-layer h4 {
-    font-size: 0.95rem; font-weight: 700; color: var(--teal);
-    margin-bottom: 0.25rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--teal);
+    margin-bottom: 0.15rem;
   }
-  .stack-layer p { font-size: 0.82rem; color: var(--text-secondary); }
-
-  /* ── BUCKET CARDS ── */
-  .bucket-card {
-    background: var(--bg-card); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 1.25rem;
-    border-top: 3px solid var(--teal);
-    box-shadow: var(--shadow);
-  }
-  .bucket-card h4 {
-    font-size: 0.9rem; font-weight: 700; color: var(--teal);
-    margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.4rem;
-  }
-  .bucket-card p { font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 0.5rem; }
-
-  /* ── EDITABLE FIELDS ── */
-  .editable {
-    width: 100%; min-height: 60px; padding: 0.6rem 0.8rem;
-    border: 1px dashed var(--teal-border); border-radius: var(--radius-sm);
-    font-family: var(--font); font-size: 0.82rem; color: var(--text);
-    background: var(--teal-bg); resize: vertical; line-height: 1.5;
-    transition: border-color 0.2s;
-  }
-  .editable:focus {
-    outline: none; border-color: var(--teal); border-style: solid;
-    background: white;
-  }
-  .editable::placeholder { color: var(--text-muted); }
-  .editable-label {
-    font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
-    letter-spacing: 0.06em; color: var(--teal); margin-bottom: 0.3rem;
+  .stack-layer p {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
   }
 
-  /* ── CHECKLIST ── */
+  /* Checklist */
   .checklist { list-style: none; padding: 0; }
   .checklist li {
-    display: flex; align-items: flex-start; gap: 0.5rem;
-    padding: 0.35rem 0; font-size: 0.85rem; color: var(--text-secondary);
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.3rem 0;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
   }
   .checklist input[type="checkbox"] {
-    accent-color: var(--teal); margin-top: 3px; flex-shrink: 0;
+    accent-color: var(--teal);
+    margin-top: 3px;
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
   }
 
-  /* ── TIME BLOCKS ── */
-  .time-grid {
-    display: grid; grid-template-columns: 70px 1fr; gap: 0;
-    border: 1px solid var(--border); border-radius: var(--radius);
-    overflow: hidden; background: var(--bg-card);
-  }
-  .time-slot {
-    font-size: 0.72rem; font-weight: 600; color: var(--text-muted);
-    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border);
-    background: rgba(0,128,128,0.03); text-align: right;
-    font-family: var(--font-mono);
-  }
-  .time-block {
-    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border);
-    font-size: 0.8rem; min-height: 32px;
-  }
-  .time-block input {
-    width: 100%; border: none; background: transparent;
-    font-family: var(--font); font-size: 0.8rem; color: var(--text);
-    outline: none;
-  }
-  .time-block input::placeholder { color: var(--text-muted); }
-  .time-block.deep { background: rgba(0,128,128,0.08); }
-  .time-block.shallow { background: rgba(200,180,80,0.08); }
-
-  /* ── PLANNING SCALE TABS ── */
-  .scale-tabs {
-    display: flex; gap: 0; margin-bottom: 1rem;
-    border: 1px solid var(--border); border-radius: var(--radius);
-    overflow: hidden;
-  }
-  .scale-tab {
-    flex: 1; padding: 0.6rem; text-align: center;
-    font-size: 0.8rem; font-weight: 600;
-    cursor: pointer; transition: all 0.2s;
-    background: var(--bg-card); color: var(--text-secondary);
-    border-right: 1px solid var(--border);
-  }
-  .scale-tab:last-child { border-right: none; }
-  .scale-tab.active { background: var(--teal); color: white; }
-  .scale-tab:hover:not(.active) { background: var(--teal-bg); color: var(--teal); }
-  .scale-content { display: none; }
-  .scale-content.active { display: block; }
-
-  /* ── HABIT TRACKER ── */
-  .habit-grid {
-    display: grid; grid-template-columns: 160px repeat(7, 1fr);
-    gap: 0; border: 1px solid var(--border); border-radius: var(--radius);
-    overflow: hidden; background: var(--bg-card);
-  }
-  .habit-header {
-    font-size: 0.7rem; font-weight: 600; color: var(--text-muted);
-    text-transform: uppercase; letter-spacing: 0.05em;
-    padding: 0.5rem; text-align: center;
-    background: rgba(0,128,128,0.04); border-bottom: 1px solid var(--border);
-  }
-  .habit-header:first-child { text-align: left; }
-  .habit-name {
-    font-size: 0.8rem; font-weight: 500; padding: 0.5rem;
-    border-bottom: 1px solid var(--border);
-    border-right: 1px solid var(--border);
-    display: flex; align-items: center; gap: 0.4rem;
-  }
-  .habit-name .dot {
-    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
-  }
-  .habit-cell {
-    display: flex; align-items: center; justify-content: center;
-    padding: 0.4rem; border-bottom: 1px solid var(--border);
-    border-right: 1px solid var(--border);
-  }
-  .habit-cell:last-child { border-right: none; }
-  .habit-cell input[type="checkbox"] { accent-color: var(--teal); }
-
-  /* ── PROGRESS BAR ── */
-  .progress-bar {
-    height: 6px; background: var(--border); border-radius: 3px;
-    overflow: hidden; margin-top: 0.5rem;
-  }
-  .progress-fill {
-    height: 100%; background: var(--teal); border-radius: 3px;
-    transition: width 0.4s ease;
-  }
-
-  /* ── PROJECT TABLE ── */
-  .project-table {
-    width: 100%; border-collapse: collapse;
-    font-size: 0.8rem;
-  }
-  .project-table th {
-    text-align: left; padding: 0.6rem 0.75rem;
-    font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.06em; color: var(--text-muted);
-    border-bottom: 2px solid var(--border); background: rgba(0,128,128,0.03);
-  }
-  .project-table td {
-    padding: 0.55rem 0.75rem; border-bottom: 1px solid var(--border);
-    vertical-align: top;
-  }
-  .project-table tr:hover td { background: var(--teal-bg); }
-  .project-table .proj-name { font-weight: 600; color: var(--text); white-space: nowrap; }
-  .project-table .proj-stack { font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono); }
-
-  .status-pill {
-    display: inline-block; padding: 2px 8px; border-radius: 12px;
-    font-size: 0.68rem; font-weight: 600; white-space: nowrap;
-  }
-  .status-pill.active { background: #dcfce7; color: #166534; }
-  .status-pill.in-progress { background: #dbeafe; color: #1e40af; }
-  .status-pill.blocked { background: #fef3c7; color: #92400e; }
-  .status-pill.stalled { background: #f3f4f6; color: #6b7280; }
-  .status-pill.complete { background: #e0e7ff; color: #3730a3; }
-
-  .type-pill {
-    display: inline-block; padding: 1px 6px; border-radius: 3px;
-    font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
-    letter-spacing: 0.04em; background: var(--teal-bg); color: var(--teal);
-    border: 1px solid var(--teal-border);
-  }
-  .type-pill.agent { background: #faf5ff; color: #7c3aed; border-color: #ddd6fe; }
-  .type-pill.client { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
-  .type-pill.personal { background: #f0fdf4; color: #166534; border-color: #bbf7d0; }
-
-  /* ── COST TABLE ── */
-  .cost-table {
-    width: 100%; border-collapse: collapse; font-size: 0.8rem;
-  }
-  .cost-table th {
-    text-align: left; padding: 0.5rem 0.75rem;
-    font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.06em; color: var(--text-muted);
-    border-bottom: 2px solid var(--border); background: rgba(0,128,128,0.03);
-  }
-  .cost-table th:last-child, .cost-table td:last-child { text-align: right; }
-  .cost-table td {
-    padding: 0.45rem 0.75rem; border-bottom: 1px solid var(--border);
-  }
-  .cost-table tr:hover td { background: var(--teal-bg); }
-  .cost-table .cost-val {
-    font-family: var(--font-mono); font-weight: 600; font-size: 0.82rem;
-  }
-  .cost-table .cost-val.high { color: #dc2626; }
-  .cost-table .cost-val.med { color: #d97706; }
-  .cost-table .cost-val.low { color: #16a34a; }
-
-  .cost-summary {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 1rem; margin-bottom: 1.25rem;
-  }
-  .cost-kpi {
-    background: var(--bg-card); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); padding: 0.75rem 1rem;
-    text-align: center;
-  }
-  .cost-kpi .kpi-label {
-    font-size: 0.68rem; font-weight: 600; text-transform: uppercase;
-    letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 0.25rem;
-  }
-  .cost-kpi .kpi-value {
-    font-size: 1.3rem; font-weight: 800; color: var(--teal);
-    font-family: var(--font-mono); letter-spacing: -0.02em;
-  }
-  .cost-kpi .kpi-sub {
-    font-size: 0.7rem; color: var(--text-muted); margin-top: 0.15rem;
-  }
-
-  .editable-inline {
-    border: none; border-bottom: 1px dashed var(--teal-border);
-    background: transparent; font-family: var(--font-mono);
-    font-size: 0.82rem; font-weight: 600; color: var(--teal-dark);
-    width: 80px; text-align: right; padding: 0 2px;
-    outline: none;
-  }
-  .editable-inline:focus {
-    border-bottom-color: var(--teal); border-bottom-style: solid;
-    background: var(--teal-bg);
-  }
-
-  /* ── QUOTE ── */
-  .quote-block {
-    border-left: 3px solid var(--teal);
-    padding: 0.75rem 1rem; background: var(--teal-bg);
-    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-    margin: 1rem 0;
-  }
-  .quote-block p {
-    font-size: 0.88rem; font-style: italic; color: var(--text-secondary);
-  }
-  .quote-block cite {
-    font-size: 0.75rem; color: var(--teal); font-style: normal; font-weight: 600;
-  }
-
-  /* ── RITUAL STEPS ── */
-  .ritual-steps {
-    counter-reset: ritual;
-    list-style: none; padding: 0;
-  }
+  /* Ritual steps */
+  .ritual-steps { counter-reset: step; list-style: none; padding: 0; }
   .ritual-steps li {
-    counter-increment: ritual;
-    display: flex; align-items: flex-start; gap: 0.75rem;
-    padding: 0.6rem 0; font-size: 0.85rem; color: var(--text-secondary);
+    counter-increment: step;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 0.4rem 0;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
   }
   .ritual-steps li::before {
-    content: counter(ritual);
-    display: flex; align-items: center; justify-content: center;
-    min-width: 24px; height: 24px; border-radius: 50%;
-    background: var(--teal); color: white; font-size: 0.7rem;
-    font-weight: 700; flex-shrink: 0;
+    content: counter(step);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--teal);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 700;
+    flex-shrink: 0;
   }
 
-  /* ── SAVE/LOAD BAR ── */
-  .action-bar {
-    position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 100;
-    display: flex; gap: 0.5rem;
-  }
-  .action-btn {
-    padding: 0.6rem 1.2rem; border-radius: 30px;
-    font-size: 0.8rem; font-weight: 600; border: none;
-    cursor: pointer; transition: all 0.2s;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  }
-  .action-btn.primary {
-    background: var(--teal); color: white;
-  }
-  .action-btn.primary:hover { background: var(--teal-dark); }
-  .action-btn.secondary {
-    background: white; color: var(--teal); border: 1px solid var(--teal-border);
-  }
-  .action-btn.secondary:hover { background: var(--teal-bg); }
+  /* Bucket cards */
+  .bucket { border-top: 3px solid var(--teal); }
 
+  /* Section divider */
+  .section-gap { margin-top: 2rem; }
+
+  /* Toast */
   .toast {
-    position: fixed; bottom: 5rem; right: 1.5rem; z-index: 200;
-    background: var(--teal-dark); color: white; padding: 0.6rem 1.2rem;
-    border-radius: 8px; font-size: 0.8rem; font-weight: 500;
-    opacity: 0; transform: translateY(10px);
-    transition: all 0.3s; pointer-events: none;
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 200;
+    background: var(--teal-dark);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none;
   }
   .toast.show { opacity: 1; transform: translateY(0); }
 
-  /* ── RESPONSIVE ── */
+  /* ═══ RESPONSIVE ═══ */
   @media (max-width: 768px) {
-    .container { padding: 1rem; }
-    .hero h1 { font-size: 1.6rem; }
-    .grid-2, .grid-3, .grid-5 { grid-template-columns: 1fr; }
-    .habit-grid { grid-template-columns: 120px repeat(7, 1fr); font-size: 0.7rem; }
-    .nav-inner { gap: 0.25rem; }
-    .nav-link { font-size: 0.7rem; padding: 4px 6px; }
-    .nav-user-email { display: none; }
+    .shell {
+      grid-template-columns: 1fr;
+      grid-template-rows: var(--topbar-h) 1fr 52px;
+    }
+    .sidebar {
+      grid-row: 3;
+      flex-direction: row;
+      border-right: none;
+      border-top: 1px solid var(--border);
+      padding: 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+    .sidebar-section { display: none; }
+    .sidebar-section:first-child {
+      display: flex;
+      gap: 0;
+      padding: 0;
+      margin: 0;
+      flex-direction: row;
+    }
+    .sidebar-label { display: none; }
+    .sidebar-item {
+      flex-direction: column;
+      gap: 0.15rem;
+      padding: 0.4rem 0.75rem;
+      font-size: 0.62rem;
+      min-height: auto;
+      white-space: nowrap;
+    }
+    .sidebar-item .icon { font-size: 1.1rem; }
+    .sidebar-item .badge { display: none; }
+    .sidebar-spacer, .sidebar-footer { display: none; }
+    .main { padding: 1rem; }
+    .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    .habit-grid { grid-template-columns: 100px repeat(7, 1fr); font-size: 0.7rem; }
+    .topbar-date, .topbar-user { display: none; }
   }
 
-  /* ── PRINT / PDF ── */
+  /* ═══ PRINT ═══ */
   @media print {
-    .top-nav, .action-bar, .toast, .nav-user { display: none !important; }
-    .section-body.collapsed { max-height: none !important; opacity: 1 !important; }
-    .section-toggle { display: none !important; }
-    body { background: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .container { max-width: 100%; padding: 0.5in; }
-    .hero { padding: 1rem 0; }
-    .hero h1 { font-size: 1.6rem; }
-    .section { page-break-inside: avoid; margin-bottom: 1.5rem; }
-    .card { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
-    .editable {
-      border: 1px solid #ccc !important; border-style: solid !important;
-      background: #fafafa !important; min-height: auto !important;
+    .shell { display: block; height: auto; overflow: visible; }
+    .sidebar, .topbar, .toast { display: none !important; }
+    .main { overflow: visible; padding: 0.5in; }
+    .panel { display: block !important; page-break-after: always; }
+    .tab-content { display: block !important; }
+    .card { box-shadow: none; page-break-inside: avoid; }
+    body { background: white; }
+  }
+
+  /* ═══ REDUCED MOTION ═══ */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
     }
-    .editable:empty::after { content: '(empty)'; color: #999; font-style: italic; }
-    .scale-content { display: block !important; margin-bottom: 1rem; }
-    .scale-tabs { display: none !important; }
-    .bucket-card { page-break-inside: avoid; }
-    .stack-layer { page-break-inside: avoid; }
-    .time-grid { page-break-inside: avoid; }
-    .habit-grid { page-break-inside: avoid; }
-    .quote-block { page-break-inside: avoid; }
-
-    /* Print header/footer */
-    @page {
-      margin: 0.6in;
-      @bottom-center {
-        content: "Life Central Dashboard — Printed " attr(date);
-      }
-    }
-
-    /* Print-only timestamp */
-    .print-timestamp { display: block !important; }
   }
-
-  .print-timestamp {
-    display: none;
-    text-align: center;
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    margin-top: 0.5rem;
-  }
-
-  /* ── SYNC INDICATOR ── */
-  .sync-status {
-    font-size: 0.65rem;
-    padding: 2px 6px;
-    border-radius: 3px;
-    font-weight: 600;
-  }
-  .sync-status.synced { color: #16a34a; background: #f0fdf4; }
-  .sync-status.local { color: #d97706; background: #fffbeb; }
 </style>
 </head>
 <body>
 
-<!-- NAV -->
-<nav class="top-nav">
-  <div class="nav-inner">
-    <span class="nav-brand">Life Central</span>
-    <a href="#projects" class="nav-link" style="font-weight:700;">Projects</a>
-    <a href="#costs" class="nav-link" style="font-weight:700;">Costs</a>
-    <a href="#vision" class="nav-link">Vision</a>
-    <a href="#deep-life-stack" class="nav-link">Stack</a>
-    <a href="#buckets" class="nav-link">Buckets</a>
-    <a href="#values" class="nav-link">Values</a>
-    <a href="#multi-scale" class="nav-link">Planning</a>
-    <a href="#productivity" class="nav-link">Funnel</a>
-    <a href="#time-block" class="nav-link">Time Block</a>
-    <a href="#habits" class="nav-link">Habits</a>
-    <a href="#shutdown" class="nav-link">Shutdown</a>
-    <div class="nav-user" id="nav-user">
-      <span class="sync-status local" id="sync-indicator">LOCAL</span>
-      <span class="nav-user-email" id="user-email"></span>
-      <a href="#" class="nav-user-btn" id="auth-btn" onclick="handleAuthAction()">Sign In</a>
+<div class="shell">
+
+<!-- ═══ TOP BAR ═══ -->
+<div class="topbar">
+  <span class="topbar-brand">Life Central</span>
+  <span class="topbar-date" id="today-date"></span>
+  <span class="topbar-spacer"></span>
+  <span class="topbar-sync local" id="sync-indicator">LOCAL</span>
+  <span class="topbar-user" id="user-email"></span>
+  <a href="#" class="topbar-btn" id="auth-btn" onclick="handleAuthAction()">Sign In</a>
+</div>
+
+<!-- ═══ SIDEBAR ═══ -->
+<nav class="sidebar">
+  <div class="sidebar-section">
+    <div class="sidebar-label">Daily</div>
+    <div class="sidebar-item active" onclick="showPanel('today')" data-panel="today">
+      <span class="icon">&#9673;</span> Today
     </div>
+    <div class="sidebar-item" onclick="showPanel('timeblock')" data-panel="timeblock">
+      <span class="icon">&#9637;</span> Time Block
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Operations</div>
+    <div class="sidebar-item" onclick="showPanel('projects')" data-panel="projects">
+      <span class="icon">&#9670;</span> Projects
+      <span class="badge">15</span>
+    </div>
+    <div class="sidebar-item" onclick="showPanel('costs')" data-panel="costs">
+      <span class="icon">&#36;</span> Costs
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Planning</div>
+    <div class="sidebar-item" onclick="showPanel('planning')" data-panel="planning">
+      <span class="icon">&#9776;</span> Multi-Scale
+    </div>
+    <div class="sidebar-item" onclick="showPanel('productivity')" data-panel="productivity">
+      <span class="icon">&#8635;</span> Productivity
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-label">Life System</div>
+    <div class="sidebar-item" onclick="showPanel('vision')" data-panel="vision">
+      <span class="icon">&#9733;</span> Vision
+    </div>
+    <div class="sidebar-item" onclick="showPanel('stack')" data-panel="stack">
+      <span class="icon">&#9650;</span> Deep Life Stack
+    </div>
+    <div class="sidebar-item" onclick="showPanel('buckets')" data-panel="buckets">
+      <span class="icon">&#9673;</span> Life Buckets
+    </div>
+    <div class="sidebar-item" onclick="showPanel('values')" data-panel="values">
+      <span class="icon">&#9830;</span> Values & Code
+    </div>
+  </div>
+
+  <div class="sidebar-spacer"></div>
+
+  <div class="sidebar-footer">
+    <button class="sidebar-footer-btn" onclick="handleSave()">Save</button>
+    <button class="sidebar-footer-btn" onclick="handleExport()">Export</button>
+    <button class="sidebar-footer-btn" onclick="window.print()">PDF</button>
   </div>
 </nav>
 
-<div class="container">
+<!-- ═══ MAIN CONTENT ═══ -->
+<div class="main" id="main-content">
 
-<!-- HERO -->
-<div class="hero">
-  <h1>Life Central Planning Dashboard</h1>
-  <p>A complete implementation of Cal Newport's Deep Life philosophy — from vision to daily execution.</p>
-  <span class="hero-subtitle">Deep Life Stack v2.0 + Multi-Scale Planning + Slow Productivity</span>
-  <p class="print-timestamp" id="print-ts"></p>
-</div>
-
-<!-- ═══ PROJECT COMMAND ═══ -->
-<div class="section" id="projects">
-  <div class="section-header" onclick="toggleSection(this)">
-    <h2>Project Command</h2>
-    <span class="section-badge">15 Projects</span>
-    <span class="section-toggle">&#9660;</span>
+<!-- ── TODAY PANEL ── -->
+<div class="panel active" id="panel-today">
+  <div class="panel-header">
+    <h1>Today</h1>
+    <p>Your daily execution view. Focus on what matters right now.</p>
   </div>
-  <div class="section-body">
-    <div class="cost-summary" style="margin-bottom: 1.25rem;">
-      <div class="cost-kpi">
-        <div class="kpi-label">Active</div>
-        <div class="kpi-value" id="proj-active">8</div>
-        <div class="kpi-sub">in progress</div>
-      </div>
-      <div class="cost-kpi">
-        <div class="kpi-label">Complete</div>
-        <div class="kpi-value" style="color: #16a34a;" id="proj-complete">5</div>
-        <div class="kpi-sub">shipped</div>
-      </div>
-      <div class="cost-kpi">
-        <div class="kpi-label">Blocked</div>
-        <div class="kpi-value" style="color: #d97706;" id="proj-blocked">0</div>
-        <div class="kpi-sub">needs attention</div>
-      </div>
-      <div class="cost-kpi">
-        <div class="kpi-label">Stalled</div>
-        <div class="kpi-value" style="color: #6b7280;" id="proj-stalled">2</div>
-        <div class="kpi-sub">no recent activity</div>
-      </div>
-    </div>
 
-    <div class="card" style="padding: 0; overflow-x: auto;">
-      <table class="project-table" id="project-table">
-        <thead>
-          <tr>
-            <th>Project</th>
-            <th>Type</th>
-            <th>Status</th>
-            <th>Stack</th>
-            <th>Next Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="proj-name">Nielsen Bot</td>
-            <td><span class="type-pill client">Client</span></td>
-            <td><span class="status-pill active">Active</span></td>
-            <td class="proj-stack">Python, Claude API</td>
-            <td><input data-key="proj-nielsen-next" placeholder="Fix hallucination + retrieval" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
-          </tr>
-          <tr>
-            <td class="proj-name">Paperclip</td>
-            <td><span class="type-pill agent">Agent</span></td>
-            <td><span class="status-pill in-progress">In Progress</span></td>
-            <td class="proj-stack">Node/TS, PostgreSQL</td>
-            <td><input data-key="proj-paperclip-next" placeholder="Multi-agent orchestration" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
-          </tr>
-          <tr>
-            <td class="proj-name">NanoClaw</td>
-            <td><span class="type-pill agent">Agent</span></td>
-            <td><span class="status-pill active">Active</span></td>
-            <td class="proj-stack">Node/TS, SQLite, Docker</td>
-            <td><input data-key="proj-nanoclaw-next" placeholder="WhatsApp + Telegram live" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
-          </tr>
-          <tr>
-            <td class="proj-name">Twitter Bookmark Agent</td>
-            <td><span class="type-pill agent">Agent</span></td>
-            <td><span class="status-pill active">Active</span></td>
-            <td class="proj-stack">Python, Lambda, Pinecone</td>
-            <td><input data-key="proj-twitter-next" placeholder="RAG chatbot via Telegram" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
-          </tr>
-          <tr>
-            <td class="proj-name">Strator / MedNex</td>
-            <td><span class="type-pill client">Client</span></td>
-            <td><span class="status-pill in-progress">In Progress</span></td>
-            <td class="proj-stack">Python, Claude Sonnet</td>
-            <td><input data-key="proj-strator-next" placeholder="Clarify role w/ Kevin" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
-          </tr>
-          <tr>
-            <td class="proj-name">Carer Liaison</td>
-            <td><span class="type-pill agent">Agent</span></td>
-            <td><span class="status-pill in-progress">In Progress</span></td>
-            <td class="proj-stack">Python, Claude, Obsidian</td>
-            <td><input data-key="proj-carer-next" placeholder="6-agent NDIS system" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
-          </tr>
-          <tr>
-            <td class="proj-name">VoiceNote Pipeline</td>
-            <td><span class="type-pill agent">Agent</span></td>
-            <td><span class="status-pill active">Active</span></td>
-            <td class="proj-stack">Python, Deepgram, OpenRouter</td>
-            <td><input data-key="proj-voice-next" placeholder="Voice → Obsidian notes" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
-          </tr>
-          <tr>
-            <td class="proj-name">Video (Remotion)</td>
-            <td><span class="type-pill">Product</span></td>
-            <td><span class="status-pill active">Active</span></td>
-            <td class="proj-stack">Next.js, React, Remotion</td>
-            <td><input data-key="proj-video-next" placeholder="Prompt → motion graphics" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
-          </tr>
-          <tr>
-            <td class="proj-name">buildpersonalbranding.com</td>
-            <td><span class="type-pill personal">Business</span></td>
-            <td><span class="status-pill blocked">Blocked</span></td>
-            <td class="proj-stack">TBD — $8K + $2.5K/mo</td>
-            <td><input data-key="proj-bpb-next" placeholder="10 PRD questions outstanding" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
-          </tr>
-          <tr>
-            <td class="proj-name">Personal Website</td>
-            <td><span class="type-pill personal">Personal</span></td>
-            <td><span class="status-pill complete">Complete</span></td>
-            <td class="proj-stack">HTML/CSS/JS, GitHub Pages</td>
-            <td><input data-key="proj-site-next" placeholder="Spec locked, needs content" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
-          </tr>
-          <tr>
-            <td class="proj-name">Life Central Dashboard</td>
-            <td><span class="type-pill personal">Personal</span></td>
-            <td><span class="status-pill active">Active</span></td>
-            <td class="proj-stack">HTML/JS, Supabase, GH Pages</td>
-            <td><input data-key="proj-dashboard-next" placeholder="v1.1 — projects + costs" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
-          </tr>
-          <tr>
-            <td class="proj-name">Claude Chat Analysis</td>
-            <td><span class="type-pill">Research</span></td>
-            <td><span class="status-pill complete">Complete</span></td>
-            <td class="proj-stack">Python, D3.js, NLP</td>
-            <td><input data-key="proj-analysis-next" placeholder="Scrollytelling visualization done" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
-          </tr>
-          <tr>
-            <td class="proj-name">Autonomous Agent Gallery</td>
-            <td><span class="type-pill">Showcase</span></td>
-            <td><span class="status-pill complete">Complete</span></td>
-            <td class="proj-stack">React, Vite, Tailwind</td>
-            <td><input data-key="proj-gallery-next" placeholder="33 OpenClaw use cases" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
-          </tr>
-          <tr>
-            <td class="proj-name">Software Foundry</td>
-            <td><span class="type-pill agent">Agent</span></td>
-            <td><span class="status-pill in-progress">In Progress</span></td>
-            <td class="proj-stack">Protocol / Framework</td>
-            <td><input data-key="proj-foundry-next" placeholder="Multi-agent roles defined" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
-          </tr>
-          <tr>
-            <td class="proj-name">Bridge AI FZCO</td>
-            <td><span class="type-pill">Admin</span></td>
-            <td><span class="status-pill blocked">Blocked</span></td>
-            <td class="proj-stack">UAE liquidation</td>
-            <td><input data-key="proj-bridge-next" placeholder="Blocked on FTA docs" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
-          </tr>
-          <tr>
-            <td class="proj-name">jkurn-profile (Next.js)</td>
-            <td><span class="type-pill personal">Personal</span></td>
-            <td><span class="status-pill stalled">Stalled</span></td>
-            <td class="proj-stack">Next.js, React, TS</td>
-            <td><input data-key="proj-jkurn-next" placeholder="Scaffold only — superseded?" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
-          </tr>
-          <tr>
-            <td class="proj-name">WhatsApp Agent</td>
-            <td><span class="type-pill agent">Agent</span></td>
-            <td><span class="status-pill stalled">Stalled</span></td>
-            <td class="proj-stack">Placeholder</td>
-            <td><input data-key="proj-wa-next" placeholder="Empty repo — merge into NanoClaw?" style="border:none;background:transparent;font-size:0.8rem;width:100%;font-family:var(--font);"></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div style="margin-top: 0.75rem; font-size: 0.72rem; color: var(--text-muted);">
-      Edit "Next Action" fields inline. All changes auto-save.
-    </div>
-  </div>
-</div>
-
-<!-- ═══ COST CENTER ═══ -->
-<div class="section" id="costs">
-  <div class="section-header" onclick="toggleSection(this)">
-    <h2>Cost Center</h2>
-    <span class="section-badge">Monthly Spend</span>
-    <span class="section-toggle">&#9660;</span>
-  </div>
-  <div class="section-body">
-    <div class="cost-summary">
-      <div class="cost-kpi">
-        <div class="kpi-label">Total Monthly</div>
-        <div class="kpi-value" id="cost-total">$0</div>
-        <div class="kpi-sub">all services</div>
-      </div>
-      <div class="cost-kpi">
-        <div class="kpi-label">AI / LLM APIs</div>
-        <div class="kpi-value" id="cost-ai">$0</div>
-        <div class="kpi-sub">Claude, OpenRouter, Deepgram</div>
-      </div>
-      <div class="cost-kpi">
-        <div class="kpi-label">Infrastructure</div>
-        <div class="kpi-value" id="cost-infra">$0</div>
-        <div class="kpi-sub">AWS, Pinecone, hosting</div>
-      </div>
-      <div class="cost-kpi">
-        <div class="kpi-label">Monthly Budget</div>
-        <div class="kpi-value" style="color: var(--text);" id="cost-budget">$200</div>
-        <div class="kpi-sub">target ceiling</div>
-      </div>
-    </div>
-
-    <div class="card" style="padding: 0; overflow-x: auto;">
-      <table class="cost-table" id="cost-table">
-        <thead>
-          <tr>
-            <th>Service</th>
-            <th>Category</th>
-            <th>Used By</th>
-            <th>Pricing Model</th>
-            <th>Monthly Est.</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td style="font-weight: 600;">Anthropic (Claude API)</td>
-            <td>AI / LLM</td>
-            <td style="font-size: 0.75rem;">Paperclip, NanoClaw, Nielsen, MedNex, Carer Liaison</td>
-            <td style="font-size: 0.75rem;">Per-token</td>
-            <td><input class="editable-inline cost-input" data-key="cost-claude" data-category="ai" placeholder="0.00"></td>
-          </tr>
-          <tr>
-            <td style="font-weight: 600;">OpenRouter</td>
-            <td>AI / LLM</td>
-            <td style="font-size: 0.75rem;">VoiceNote Pipeline</td>
-            <td style="font-size: 0.75rem;">Per-token (Gemini/Claude)</td>
-            <td><input class="editable-inline cost-input" data-key="cost-openrouter" data-category="ai" placeholder="0.00"></td>
-          </tr>
-          <tr>
-            <td style="font-weight: 600;">Deepgram</td>
-            <td>AI / LLM</td>
-            <td style="font-size: 0.75rem;">VoiceNote Pipeline</td>
-            <td style="font-size: 0.75rem;">$0.0043/min (Nova-2)</td>
-            <td><input class="editable-inline cost-input" data-key="cost-deepgram" data-category="ai" placeholder="0.00"></td>
-          </tr>
-          <tr>
-            <td style="font-weight: 600;">AWS Lambda</td>
-            <td>Infrastructure</td>
-            <td style="font-size: 0.75rem;">Twitter Bookmark Agent</td>
-            <td style="font-size: 0.75rem;">Pay-per-invocation</td>
-            <td><input class="editable-inline cost-input" data-key="cost-aws" data-category="infra" placeholder="0.00"></td>
-          </tr>
-          <tr>
-            <td style="font-weight: 600;">Pinecone</td>
-            <td>Infrastructure</td>
-            <td style="font-size: 0.75rem;">Twitter Bookmark Agent</td>
-            <td style="font-size: 0.75rem;">$0.10/1M vectors + queries</td>
-            <td><input class="editable-inline cost-input" data-key="cost-pinecone" data-category="infra" placeholder="0.00"></td>
-          </tr>
-          <tr>
-            <td style="font-weight: 600;">Supabase</td>
-            <td>Infrastructure</td>
-            <td style="font-size: 0.75rem;">Life Central Dashboard</td>
-            <td style="font-size: 0.75rem;">Free tier / $25 Pro</td>
-            <td><input class="editable-inline cost-input" data-key="cost-supabase" data-category="infra" placeholder="0.00"></td>
-          </tr>
-          <tr>
-            <td style="font-weight: 600;">GitHub Pages</td>
-            <td>Infrastructure</td>
-            <td style="font-size: 0.75rem;">Dashboard, Personal Site, Gallery</td>
-            <td style="font-size: 0.75rem;">Free</td>
-            <td><input class="editable-inline cost-input" data-key="cost-ghpages" data-category="infra" value="0.00" placeholder="0.00"></td>
-          </tr>
-          <tr>
-            <td style="font-weight: 600;">Vercel</td>
-            <td>Infrastructure</td>
-            <td style="font-size: 0.75rem;">Video (Remotion)</td>
-            <td style="font-size: 0.75rem;">Free tier / Pro</td>
-            <td><input class="editable-inline cost-input" data-key="cost-vercel" data-category="infra" placeholder="0.00"></td>
-          </tr>
-          <tr>
-            <td style="font-weight: 600;">Replit</td>
-            <td>Infrastructure</td>
-            <td style="font-size: 0.75rem;">Strator / MedNex</td>
-            <td style="font-size: 0.75rem;">Free tier</td>
-            <td><input class="editable-inline cost-input" data-key="cost-replit" data-category="infra" placeholder="0.00"></td>
-          </tr>
-          <tr>
-            <td style="font-weight: 600;">Claude Code (Subscription)</td>
-            <td>Tools</td>
-            <td style="font-size: 0.75rem;">All development</td>
-            <td style="font-size: 0.75rem;">Monthly subscription</td>
-            <td><input class="editable-inline cost-input" data-key="cost-claudecode" data-category="ai" placeholder="0.00"></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div style="margin-top: 1rem;">
-      <div class="editable-label">Cost Notes & Observations</div>
-      <textarea class="editable" data-key="cost-notes" style="min-height: 60px;" placeholder="Track anomalies, spikes, budget decisions here..."></textarea>
-    </div>
-  </div>
-</div>
-
-<!-- 1. LIFESTYLE-CENTRIC VISION -->
-<div class="section" id="vision">
-  <div class="section-header" onclick="toggleSection(this)">
-    <h2>Lifestyle-Centric Vision</h2>
-    <span class="section-badge">Foundation</span>
-    <span class="section-toggle">&#9660;</span>
-  </div>
-  <div class="section-body">
-    <div class="quote-block">
-      <p>"Instead of trying to figure out what job you're passionate about, figure out the lifestyle you want — then work backward to find careers that can support it."</p>
-      <cite>— Cal Newport</cite>
-    </div>
-    <div class="grid-2">
-      <div class="card">
-        <h3>My Ideal Lifestyle (5–10 Year Vision)</h3>
-        <p>Describe your ideal daily life in vivid detail. Where do you live? What does a Tuesday look like? How do you feel? Don't name a job — describe the experience.</p>
-        <div style="margin-top: 0.75rem;">
-          <div class="editable-label">Morning</div>
-          <textarea class="editable" data-key="vision-morning" placeholder="What does your ideal morning look like?"></textarea>
-          <div class="editable-label" style="margin-top: 0.5rem;">Workday</div>
-          <textarea class="editable" data-key="vision-workday" placeholder="What kind of work are you doing? How long? With whom?"></textarea>
-          <div class="editable-label" style="margin-top: 0.5rem;">Evening & Relationships</div>
-          <textarea class="editable" data-key="vision-evening" placeholder="Who are you spending time with? What does rest look like?"></textarea>
-          <div class="editable-label" style="margin-top: 0.5rem;">Overall Feeling</div>
-          <textarea class="editable" data-key="vision-feeling" placeholder="What's the dominant feeling? Calm? Creative energy? Freedom?"></textarea>
+  <div class="grid-2">
+    <div>
+      <!-- Top 3 -->
+      <div class="card" style="margin-bottom: 1rem;">
+        <div class="card-title">Today's Top 3</div>
+        <div class="field-group">
+          <textarea class="field compact" data-key="daily-top3" rows="3" placeholder="1. &#10;2. &#10;3."></textarea>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Collection Column</div>
+          <textarea class="field" data-key="daily-collection" rows="3" placeholder="Capture thoughts, tasks, ideas here..."></textarea>
         </div>
       </div>
+
+      <!-- Slow Productivity -->
       <div class="card">
-        <h3>Career Capital Assessment</h3>
-        <p>What rare and valuable skills do you possess (or are building) that give you leverage to negotiate toward this lifestyle?</p>
-        <div style="margin-top: 0.75rem;">
-          <div class="editable-label">Current Career Capital</div>
-          <textarea class="editable" data-key="capital-current" placeholder="List your rare/valuable skills, expertise, credentials..."></textarea>
-          <div class="editable-label" style="margin-top: 0.5rem;">Capital I Need to Build</div>
-          <textarea class="editable" data-key="capital-needed" placeholder="What skills would close the gap between current state and vision?"></textarea>
-          <div class="editable-label" style="margin-top: 0.5rem;">Craftsman Mindset Focus</div>
-          <textarea class="editable" data-key="capital-craft" placeholder="What am I doing right now to become so good they can't ignore me?"></textarea>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- 2. DEEP LIFE STACK v2.0 -->
-<div class="section" id="deep-life-stack">
-  <div class="section-header" onclick="toggleSection(this)">
-    <h2>Deep Life Stack v2.0</h2>
-    <span class="section-badge">Framework</span>
-    <span class="section-toggle">&#9660;</span>
-  </div>
-  <div class="section-body">
-    <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
-      Two stages. The first builds you into a capable human being. The second cultivates a life of depth and meaning. Dedicate 1–3 weeks to each layer, then revisit the full stack every 6–12 months.
-    </p>
-    <div style="margin-bottom: 1rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--teal);">Stage 1 — Become a Capable Human Being</div>
-    <div class="stack-layers" style="margin-left: 16px; margin-bottom: 2rem;">
-      <div class="stack-layer">
-        <span class="layer-number">1</span>
-        <h4>Discipline</h4>
-        <p>Change your self-identity to someone who can persist with difficult things. Establish <strong>keystone habits</strong>:</p>
-        <ul style="margin-top: 0.4rem; padding-left: 1.2rem;">
-          <li style="font-size: 0.82rem; color: var(--text-secondary);"><strong>Body</strong> — Daily physical practice</li>
-          <li style="font-size: 0.82rem; color: var(--text-secondary);"><strong>Mind</strong> — Daily cognitive sharpening</li>
-          <li style="font-size: 0.82rem; color: var(--text-secondary);"><strong>Heart</strong> — Daily connection</li>
-        </ul>
-        <textarea class="editable" data-key="stack-discipline" style="margin-top: 0.6rem;" placeholder="My discipline commitments..."></textarea>
-      </div>
-      <div class="stack-layer">
-        <span class="layer-number">2</span>
-        <h4>Control</h4>
-        <p>Gain control over your time and obligations. Implement <strong>multi-scale planning</strong>. Build a capture system. Tame email and obligations.</p>
-        <textarea class="editable" data-key="stack-control" style="margin-top: 0.6rem;" placeholder="What systems am I putting in place?"></textarea>
-      </div>
-      <div class="stack-layer">
-        <span class="layer-number">3</span>
-        <h4>Craft / Skill Development</h4>
-        <p>Deliberately improve skills around valuable areas. Pursue <strong>deliberate practice</strong> in your primary craft.</p>
-        <textarea class="editable" data-key="stack-craft" style="margin-top: 0.6rem;" placeholder="What craft am I deliberately practicing?"></textarea>
-      </div>
-      <div class="stack-layer">
-        <span class="layer-number">4</span>
-        <h4>Simplification</h4>
-        <p>Simplify your technological interactions. Implement the <strong>phone foyer method</strong>. Reduce digital noise.</p>
-        <textarea class="editable" data-key="stack-simplify" style="margin-top: 0.6rem;" placeholder="What am I simplifying or removing?"></textarea>
-      </div>
-    </div>
-    <div style="margin-bottom: 1rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--teal);">Stage 2 — Cultivate Depth</div>
-    <div class="stack-layers" style="margin-left: 16px;">
-      <div class="stack-layer">
-        <span class="layer-number">5</span>
-        <h4>Values & Code</h4>
-        <p>Define a <strong>personal code</strong> that guides decisions and actions. Establish rituals that connect you to your values.</p>
-        <textarea class="editable" data-key="stack-values" style="margin-top: 0.6rem;" placeholder="What are my core values and principles?"></textarea>
-      </div>
-      <div class="stack-layer">
-        <span class="layer-number">6</span>
-        <h4>Service & Community</h4>
-        <p>Use your capabilities to serve others. Build strong relationships through sacrificing time and attention.</p>
-        <textarea class="editable" data-key="stack-service" style="margin-top: 0.6rem;" placeholder="How am I serving my community?"></textarea>
-      </div>
-      <div class="stack-layer">
-        <span class="layer-number">7</span>
-        <h4>Vision & Transformation</h4>
-        <p>This is where <strong>lifestyle-centric planning</strong> lives. With all lower layers solid, plan for the remarkable.</p>
-        <textarea class="editable" data-key="stack-vision" style="margin-top: 0.6rem;" placeholder="What remarkable transformation am I pursuing?"></textarea>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- 3. DEEP LIFE BUCKETS -->
-<div class="section" id="buckets">
-  <div class="section-header" onclick="toggleSection(this)">
-    <h2>Deep Life Buckets</h2>
-    <span class="section-badge">The 5 C's</span>
-    <span class="section-toggle">&#9660;</span>
-  </div>
-  <div class="section-body">
-    <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
-      Five areas of a deep life. For each 30-day cycle, attempt a limited number of changes across these buckets.
-    </p>
-    <div class="grid-5">
-      <div class="bucket-card">
-        <h4>Constitution</h4>
-        <p>Mental and physical health & wellbeing</p>
-        <div class="editable-label">Current Status</div>
-        <textarea class="editable" data-key="bucket-constitution-status" style="min-height: 40px;" placeholder="How am I doing physically and mentally?"></textarea>
-        <div class="editable-label" style="margin-top: 0.4rem;">30-Day Experiment</div>
-        <textarea class="editable" data-key="bucket-constitution-exp" style="min-height: 40px;" placeholder="What change am I testing this month?"></textarea>
-      </div>
-      <div class="bucket-card">
-        <h4>Craft</h4>
-        <p>Deliberately improving skills in valuable areas</p>
-        <div class="editable-label">Current Status</div>
-        <textarea class="editable" data-key="bucket-craft-status" style="min-height: 40px;" placeholder="What am I building mastery in?"></textarea>
-        <div class="editable-label" style="margin-top: 0.4rem;">30-Day Experiment</div>
-        <textarea class="editable" data-key="bucket-craft-exp" style="min-height: 40px;" placeholder="What skill experiment am I running?"></textarea>
-      </div>
-      <div class="bucket-card">
-        <h4>Community</h4>
-        <p>Family, friends, service to others</p>
-        <div class="editable-label">Current Status</div>
-        <textarea class="editable" data-key="bucket-community-status" style="min-height: 40px;" placeholder="How are my relationships?"></textarea>
-        <div class="editable-label" style="margin-top: 0.4rem;">30-Day Experiment</div>
-        <textarea class="editable" data-key="bucket-community-exp" style="min-height: 40px;" placeholder="What connection am I deepening?"></textarea>
-      </div>
-      <div class="bucket-card">
-        <h4>Contemplation</h4>
-        <p>Matters of the soul — philosophy, ethics, meaning</p>
-        <div class="editable-label">Current Status</div>
-        <textarea class="editable" data-key="bucket-contemplation-status" style="min-height: 40px;" placeholder="How is my inner life?"></textarea>
-        <div class="editable-label" style="margin-top: 0.4rem;">30-Day Experiment</div>
-        <textarea class="editable" data-key="bucket-contemplation-exp" style="min-height: 40px;" placeholder="What practice am I exploring?"></textarea>
-      </div>
-      <div class="bucket-card">
-        <h4>Celebration</h4>
-        <p>High-quality leisure, rest, intentional fun</p>
-        <div class="editable-label">Current Status</div>
-        <textarea class="editable" data-key="bucket-celebration-status" style="min-height: 40px;" placeholder="Am I resting well? Having real fun?"></textarea>
-        <div class="editable-label" style="margin-top: 0.4rem;">30-Day Experiment</div>
-        <textarea class="editable" data-key="bucket-celebration-exp" style="min-height: 40px;" placeholder="What leisure activity am I being intentional about?"></textarea>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- 4. VALUES & PERSONAL CODE -->
-<div class="section" id="values">
-  <div class="section-header" onclick="toggleSection(this)">
-    <h2>Values & Personal Code</h2>
-    <span class="section-badge">Compass</span>
-    <span class="section-toggle">&#9660;</span>
-  </div>
-  <div class="section-body">
-    <div class="grid-2">
-      <div class="card">
-        <h3>My Personal Code</h3>
-        <p>A document that encodes your deeply held values and the behaviors they imply. Review it weekly.</p>
-        <textarea class="editable" data-key="personal-code" style="min-height: 120px;" placeholder="Write your personal code here. What do you believe? What principles guide your decisions?"></textarea>
-      </div>
-      <div class="card">
-        <h3>Value-Aligned Rituals</h3>
-        <p>Regular practices that connect you to your code. These keep values alive rather than abstract.</p>
-        <textarea class="editable" data-key="value-rituals" style="min-height: 120px;" placeholder="What rituals reinforce your values?"></textarea>
-      </div>
-    </div>
-    <div class="card" style="margin-top: 1.25rem;">
-      <h3>Strategic Plans</h3>
-      <p>Values inform strategic plans for career and personal life. <strong>Vague goals, concrete plans.</strong></p>
-      <div class="grid-2" style="margin-top: 0.75rem;">
-        <div>
-          <div class="editable-label">Career Strategic Plan</div>
-          <textarea class="editable" data-key="strategic-career" style="min-height: 100px;" placeholder="What is my career direction? What concrete steps am I taking this quarter?"></textarea>
-        </div>
-        <div>
-          <div class="editable-label">Personal Life Strategic Plan</div>
-          <textarea class="editable" data-key="strategic-personal" style="min-height: 100px;" placeholder="What is my personal life direction? Health, relationships, contemplation, leisure?"></textarea>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- 5. MULTI-SCALE PLANNING -->
-<div class="section" id="multi-scale">
-  <div class="section-header" onclick="toggleSection(this)">
-    <h2>Multi-Scale Planning</h2>
-    <span class="section-badge">Control Layer</span>
-    <span class="section-toggle">&#9660;</span>
-  </div>
-  <div class="section-body">
-    <div class="quote-block" style="margin-bottom: 1.25rem;">
-      <p>"Plans are made on a quarterly, weekly, and daily basis. This is how we decide what to do with our time in order to do the things that are most important to us."</p>
-      <cite>— Cal Newport</cite>
-    </div>
-    <div class="scale-tabs">
-      <div class="scale-tab active" onclick="switchScale('quarterly')">Quarterly Plan</div>
-      <div class="scale-tab" onclick="switchScale('weekly')">Weekly Plan</div>
-      <div class="scale-tab" onclick="switchScale('daily')">Daily Plan</div>
-    </div>
-
-    <!-- QUARTERLY -->
-    <div class="scale-content active" id="scale-quarterly">
-      <div class="card">
-        <h3>Quarterly / Seasonal Plan</h3>
-        <p style="margin-bottom: 0.75rem;">Set at the start of each quarter. You get <strong>four resets per year</strong>.</p>
-        <div class="editable-label">Current Quarter</div>
-        <textarea class="editable" data-key="quarterly-current" style="min-height: 40px;" placeholder="Q1 2026 / Q2 2026 / etc."></textarea>
-        <div class="editable-label" style="margin-top: 0.5rem;">Quarterly Theme / Focus</div>
-        <textarea class="editable" data-key="quarterly-theme" style="min-height: 40px;" placeholder="What's the overarching theme?"></textarea>
-        <div class="grid-2" style="margin-top: 0.75rem;">
-          <div>
-            <div class="editable-label">Professional Goals</div>
-            <textarea class="editable" data-key="quarterly-pro" style="min-height: 80px;" placeholder="Key projects, skill targets, career capital moves..."></textarea>
-          </div>
-          <div>
-            <div class="editable-label">Personal Goals</div>
-            <textarea class="editable" data-key="quarterly-personal" style="min-height: 80px;" placeholder="Health, relationships, leisure, contemplation..."></textarea>
-          </div>
-        </div>
-        <div class="editable-label" style="margin-top: 0.5rem;">Guidelines & Constraints</div>
-        <textarea class="editable" data-key="quarterly-guidelines" placeholder="Rules for the quarter..."></textarea>
-      </div>
-    </div>
-
-    <!-- WEEKLY -->
-    <div class="scale-content" id="scale-weekly">
-      <div class="card">
-        <h3>Weekly Plan</h3>
-        <p style="margin-bottom: 0.75rem;">Created Monday morning. Consult your quarterly plan + calendar.</p>
-        <div class="editable-label">Week of</div>
-        <textarea class="editable" data-key="weekly-date" style="min-height: 30px;" placeholder="March 10–14, 2026"></textarea>
-        <div class="editable-label" style="margin-top: 0.5rem;">Weekly Priorities</div>
-        <textarea class="editable" data-key="weekly-priorities" style="min-height: 80px;" placeholder="What 3–5 things MUST move forward this week?"></textarea>
-        <div class="editable-label" style="margin-top: 0.5rem;">Weekly Values Intentions</div>
-        <textarea class="editable" data-key="weekly-values" style="min-height: 60px;" placeholder="How will I live my values this week?"></textarea>
-        <div class="editable-label" style="margin-top: 0.5rem;">Appointments & Hard Landscape</div>
-        <textarea class="editable" data-key="weekly-calendar" placeholder="Fixed commitments, meetings, deadlines..."></textarea>
-        <div class="editable-label" style="margin-top: 0.5rem;">End-of-Week Review Notes</div>
-        <textarea class="editable" data-key="weekly-review" placeholder="(Friday) What worked? What didn't?"></textarea>
-      </div>
-    </div>
-
-    <!-- DAILY -->
-    <div class="scale-content" id="scale-daily">
-      <div class="card">
-        <h3>Daily Plan</h3>
-        <p style="margin-bottom: 0.75rem;">Each morning, consult your weekly plan and create a time-blocked schedule.</p>
-        <div class="editable-label">Today's Date</div>
-        <textarea class="editable" data-key="daily-date" style="min-height: 30px;" placeholder="Friday, March 7, 2026"></textarea>
-        <div class="editable-label" style="margin-top: 0.5rem;">Today's Top 3</div>
-        <textarea class="editable" data-key="daily-top3" style="min-height: 60px;" placeholder="1. &#10;2. &#10;3."></textarea>
-        <div class="editable-label" style="margin-top: 0.5rem;">Collection Column</div>
-        <textarea class="editable" data-key="daily-collection" style="min-height: 60px;" placeholder="Capture tasks, ideas, and notes here throughout the day..."></textarea>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- 6. PRODUCTIVITY FUNNEL -->
-<div class="section" id="productivity">
-  <div class="section-header" onclick="toggleSection(this)">
-    <h2>Productivity Funnel</h2>
-    <span class="section-badge">Capture - Configure - Control</span>
-    <span class="section-toggle">&#9660;</span>
-  </div>
-  <div class="section-body">
-    <div class="grid-3">
-      <div class="card" style="border-top: 3px solid var(--teal);">
-        <h3>1. Capture</h3>
-        <p>Get everything out of your head. Use a <strong>WorkingMemory.txt</strong> as temporary storage.</p>
-        <ul>
-          <li>Master to-do list on your computer</li>
-          <li>Master calendar for all commitments</li>
-          <li>WorkingMemory.txt for in-the-moment capture</li>
-          <li>Collection column in daily time-block page</li>
-        </ul>
-        <textarea class="editable" data-key="funnel-capture" style="margin-top: 0.6rem;" placeholder="My capture tools & current state..."></textarea>
-      </div>
-      <div class="card" style="border-top: 3px solid var(--teal);">
-        <h3>2. Configure</h3>
-        <p>Organize captured items into structured systems. Use <strong>role-based task boards</strong>.</p>
-        <ul>
-          <li>Role-based task boards (Trello, Notion, etc.)</li>
-          <li>Each task has context and next actions</li>
-          <li>Autopilot schedule for recurring tasks</li>
-          <li>Project-level planning documents</li>
-        </ul>
-        <textarea class="editable" data-key="funnel-configure" style="margin-top: 0.6rem;" placeholder="My configure system & tools..."></textarea>
-      </div>
-      <div class="card" style="border-top: 3px solid var(--teal);">
-        <h3>3. Control</h3>
-        <p>Multi-scale planning is the control layer. Pull tasks into quarterly, weekly, daily plans.</p>
-        <ul>
-          <li>Quarterly plan sets direction</li>
-          <li>Weekly plan translates to action</li>
-          <li>Daily time-blocking executes</li>
-          <li>Shutdown ritual closes the loop</li>
-        </ul>
-        <textarea class="editable" data-key="funnel-control" style="margin-top: 0.6rem;" placeholder="My control practices & cadence..."></textarea>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- 7. TIME BLOCKING -->
-<div class="section" id="time-block">
-  <div class="section-header" onclick="toggleSection(this)">
-    <h2>Daily Time Block</h2>
-    <span class="section-badge">Every Minute Gets a Job</span>
-    <span class="section-toggle">&#9660;</span>
-  </div>
-  <div class="section-body">
-    <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
-      Block your day. Mark deep work blocks (teal) and shallow/admin blocks. Re-block as needed.
-    </p>
-    <div style="display: flex; gap: 0.75rem; margin-bottom: 1rem; font-size: 0.78rem;">
-      <span style="display: flex; align-items: center; gap: 0.3rem;"><span style="width: 12px; height: 12px; background: rgba(0,128,128,0.15); border-radius: 2px;"></span> Deep Work</span>
-      <span style="display: flex; align-items: center; gap: 0.3rem;"><span style="width: 12px; height: 12px; background: rgba(200,180,80,0.15); border-radius: 2px;"></span> Shallow / Admin</span>
-    </div>
-    <div class="grid-2">
-      <div class="time-grid">
-        <div class="time-slot">6:00</div><div class="time-block"><input data-key="tb-0600" placeholder="Morning routine..."></div>
-        <div class="time-slot">6:30</div><div class="time-block"><input data-key="tb-0630" placeholder=""></div>
-        <div class="time-slot">7:00</div><div class="time-block"><input data-key="tb-0700" placeholder=""></div>
-        <div class="time-slot">7:30</div><div class="time-block"><input data-key="tb-0730" placeholder=""></div>
-        <div class="time-slot">8:00</div><div class="time-block deep"><input data-key="tb-0800" placeholder="Deep work block 1..."></div>
-        <div class="time-slot">8:30</div><div class="time-block deep"><input data-key="tb-0830" placeholder=""></div>
-        <div class="time-slot">9:00</div><div class="time-block deep"><input data-key="tb-0900" placeholder=""></div>
-        <div class="time-slot">9:30</div><div class="time-block deep"><input data-key="tb-0930" placeholder=""></div>
-        <div class="time-slot">10:00</div><div class="time-block deep"><input data-key="tb-1000" placeholder=""></div>
-        <div class="time-slot">10:30</div><div class="time-block shallow"><input data-key="tb-1030" placeholder="Email / admin batch..."></div>
-        <div class="time-slot">11:00</div><div class="time-block shallow"><input data-key="tb-1100" placeholder=""></div>
-        <div class="time-slot">11:30</div><div class="time-block deep"><input data-key="tb-1130" placeholder="Deep work block 2..."></div>
-        <div class="time-slot">12:00</div><div class="time-block"><input data-key="tb-1200" placeholder="Lunch..."></div>
-      </div>
-      <div class="time-grid">
-        <div class="time-slot">12:30</div><div class="time-block"><input data-key="tb-1230" placeholder=""></div>
-        <div class="time-slot">1:00</div><div class="time-block deep"><input data-key="tb-1300" placeholder="Deep work block 3..."></div>
-        <div class="time-slot">1:30</div><div class="time-block deep"><input data-key="tb-1330" placeholder=""></div>
-        <div class="time-slot">2:00</div><div class="time-block deep"><input data-key="tb-1400" placeholder=""></div>
-        <div class="time-slot">2:30</div><div class="time-block shallow"><input data-key="tb-1430" placeholder="Meetings / calls..."></div>
-        <div class="time-slot">3:00</div><div class="time-block shallow"><input data-key="tb-1500" placeholder=""></div>
-        <div class="time-slot">3:30</div><div class="time-block shallow"><input data-key="tb-1530" placeholder="Email / admin..."></div>
-        <div class="time-slot">4:00</div><div class="time-block"><input data-key="tb-1600" placeholder=""></div>
-        <div class="time-slot">4:30</div><div class="time-block"><input data-key="tb-1630" placeholder="Shutdown ritual..."></div>
-        <div class="time-slot">5:00</div><div class="time-block"><input data-key="tb-1700" placeholder="Done. Shutdown complete."></div>
-        <div class="time-slot">5:30</div><div class="time-block"><input data-key="tb-1730" placeholder="Evening — not work."></div>
-        <div class="time-slot">6:00</div><div class="time-block"><input data-key="tb-1800" placeholder=""></div>
-        <div class="time-slot">6:30</div><div class="time-block"><input data-key="tb-1830" placeholder=""></div>
-      </div>
-    </div>
-    <div style="margin-top: 1rem;">
-      <div class="editable-label">Slow Productivity Check</div>
-      <div class="card" style="padding: 1rem;">
+        <div class="card-title">Slow Productivity Check</div>
         <ul class="checklist">
-          <li><input type="checkbox" data-key="sp-fewer"> <strong>Do Fewer Things</strong> — Am I protecting my schedule from overcommitment?</li>
-          <li><input type="checkbox" data-key="sp-pace"> <strong>Work at a Natural Pace</strong> — Am I allowing variation in intensity?</li>
-          <li><input type="checkbox" data-key="sp-quality"> <strong>Obsess Over Quality</strong> — Am I giving my best work the time it deserves?</li>
+          <li><input type="checkbox" data-key="sp-fewer"> <strong>Do Fewer Things</strong> — protecting my schedule?</li>
+          <li><input type="checkbox" data-key="sp-pace"> <strong>Natural Pace</strong> — allowing intensity variation?</li>
+          <li><input type="checkbox" data-key="sp-quality"> <strong>Obsess Over Quality</strong> — giving best work focus?</li>
         </ul>
       </div>
     </div>
-  </div>
-</div>
 
-<!-- 8. KEYSTONE HABITS TRACKER -->
-<div class="section" id="habits">
-  <div class="section-header" onclick="toggleSection(this)">
-    <h2>Keystone Habits Tracker</h2>
-    <span class="section-badge">Weekly View</span>
-    <span class="section-toggle">&#9660;</span>
-  </div>
-  <div class="section-body">
-    <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 1rem;">
-      Track daily keystone habits across Body, Mind, and Heart — the foundation of the Discipline layer.
-    </p>
-    <div class="habit-grid" id="habit-tracker">
-      <div class="habit-header">Habit</div>
-      <div class="habit-header">Mon</div>
-      <div class="habit-header">Tue</div>
-      <div class="habit-header">Wed</div>
-      <div class="habit-header">Thu</div>
-      <div class="habit-header">Fri</div>
-      <div class="habit-header">Sat</div>
-      <div class="habit-header">Sun</div>
-
-      <div class="habit-name"><span class="dot" style="background: #22c55e;"></span> Exercise / Walk</div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-body-1"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-body-2"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-body-3"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-body-4"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-body-5"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-body-6"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-body-7"></div>
-
-      <div class="habit-name"><span class="dot" style="background: #3b82f6;"></span> Read / Learn</div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-mind-1"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-mind-2"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-mind-3"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-mind-4"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-mind-5"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-mind-6"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-mind-7"></div>
-
-      <div class="habit-name"><span class="dot" style="background: #ef4444;"></span> Connect / Serve</div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-heart-1"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-heart-2"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-heart-3"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-heart-4"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-heart-5"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-heart-6"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-heart-7"></div>
-
-      <div class="habit-name"><span class="dot" style="background: var(--teal);"></span> Deep Work (3+ hrs)</div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-deep-1"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-deep-2"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-deep-3"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-deep-4"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-deep-5"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-deep-6"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-deep-7"></div>
-
-      <div class="habit-name"><span class="dot" style="background: #8b5cf6;"></span> Time-Blocked Day</div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-tb-1"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-tb-2"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-tb-3"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-tb-4"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-tb-5"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-tb-6"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-tb-7"></div>
-
-      <div class="habit-name"><span class="dot" style="background: #f59e0b;"></span> Shutdown Complete</div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-shut-1"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-shut-2"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-shut-3"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-shut-4"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-shut-5"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-shut-6"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-shut-7"></div>
-
-      <div class="habit-name"><span class="dot" style="background: #a855f7;"></span> Contemplation</div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-contemp-1"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-contemp-2"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-contemp-3"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-contemp-4"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-contemp-5"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-contemp-6"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-contemp-7"></div>
-
-      <div class="habit-name"><span class="dot" style="background: #64748b;"></span> Phone Foyer Method</div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-phone-1"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-phone-2"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-phone-3"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-phone-4"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-phone-5"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-phone-6"></div>
-      <div class="habit-cell"><input type="checkbox" data-key="h-phone-7"></div>
-    </div>
-    <div style="margin-top: 1rem; display: flex; align-items: center; gap: 1rem;">
-      <span style="font-size: 0.8rem; color: var(--text-secondary);">Weekly completion:</span>
-      <div class="progress-bar" style="flex: 1; max-width: 300px;">
-        <div class="progress-fill" id="habit-progress" style="width: 0%;"></div>
+    <div>
+      <!-- Shutdown Ritual -->
+      <div class="card" style="margin-bottom: 1rem;">
+        <div class="card-title">Shutdown Ritual</div>
+        <div class="card-subtitle">Run at end of workday. 3-5 minutes.</div>
+        <ol class="ritual-steps">
+          <li>Process collection column</li>
+          <li>Check email inbox</li>
+          <li>Review task boards</li>
+          <li>Review calendar (tomorrow + 2-3 days)</li>
+          <li>Update weekly plan</li>
+          <li>Draft tomorrow's time block</li>
+          <li>Close all work tabs</li>
+        </ol>
+        <div style="margin-top: 0.75rem; padding: 0.6rem; background: var(--teal-bg); border-radius: var(--radius-sm); text-align: center;">
+          <label style="display: flex; align-items: center; justify-content: center; gap: 0.4rem; cursor: pointer; font-size: 0.88rem; font-weight: 700; color: var(--teal);">
+            <input type="checkbox" data-key="shutdown-done" style="width: 18px; height: 18px; accent-color: var(--teal);">
+            SHUTDOWN COMPLETE
+          </label>
+        </div>
       </div>
-      <span id="habit-pct" style="font-size: 0.8rem; font-weight: 600; color: var(--teal);">0%</span>
+    </div>
+  </div>
+
+  <!-- Habits -->
+  <div class="section-gap">
+    <div class="card">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+        <div class="card-title" style="margin-bottom: 0;">Keystone Habits</div>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <div class="progress-bar" style="width: 120px;"><div class="progress-fill" id="habit-progress" style="width: 0%;"></div></div>
+          <span id="habit-pct" style="font-size: 0.72rem; font-weight: 600; color: var(--teal);">0%</span>
+        </div>
+      </div>
+      <div class="habit-grid" id="habit-tracker">
+        <div class="habit-header">Habit</div>
+        <div class="habit-header">Mon</div><div class="habit-header">Tue</div><div class="habit-header">Wed</div>
+        <div class="habit-header">Thu</div><div class="habit-header">Fri</div><div class="habit-header">Sat</div><div class="habit-header">Sun</div>
+
+        <div class="habit-name"><span class="habit-dot" style="background:#22c55e"></span> Exercise</div>
+        <div class="habit-cell"><input type="checkbox" data-key="h-body-1"></div><div class="habit-cell"><input type="checkbox" data-key="h-body-2"></div><div class="habit-cell"><input type="checkbox" data-key="h-body-3"></div><div class="habit-cell"><input type="checkbox" data-key="h-body-4"></div><div class="habit-cell"><input type="checkbox" data-key="h-body-5"></div><div class="habit-cell"><input type="checkbox" data-key="h-body-6"></div><div class="habit-cell"><input type="checkbox" data-key="h-body-7"></div>
+
+        <div class="habit-name"><span class="habit-dot" style="background:#3b82f6"></span> Read / Learn</div>
+        <div class="habit-cell"><input type="checkbox" data-key="h-mind-1"></div><div class="habit-cell"><input type="checkbox" data-key="h-mind-2"></div><div class="habit-cell"><input type="checkbox" data-key="h-mind-3"></div><div class="habit-cell"><input type="checkbox" data-key="h-mind-4"></div><div class="habit-cell"><input type="checkbox" data-key="h-mind-5"></div><div class="habit-cell"><input type="checkbox" data-key="h-mind-6"></div><div class="habit-cell"><input type="checkbox" data-key="h-mind-7"></div>
+
+        <div class="habit-name"><span class="habit-dot" style="background:#ef4444"></span> Connect</div>
+        <div class="habit-cell"><input type="checkbox" data-key="h-heart-1"></div><div class="habit-cell"><input type="checkbox" data-key="h-heart-2"></div><div class="habit-cell"><input type="checkbox" data-key="h-heart-3"></div><div class="habit-cell"><input type="checkbox" data-key="h-heart-4"></div><div class="habit-cell"><input type="checkbox" data-key="h-heart-5"></div><div class="habit-cell"><input type="checkbox" data-key="h-heart-6"></div><div class="habit-cell"><input type="checkbox" data-key="h-heart-7"></div>
+
+        <div class="habit-name"><span class="habit-dot" style="background:var(--teal)"></span> Deep Work 3h+</div>
+        <div class="habit-cell"><input type="checkbox" data-key="h-deep-1"></div><div class="habit-cell"><input type="checkbox" data-key="h-deep-2"></div><div class="habit-cell"><input type="checkbox" data-key="h-deep-3"></div><div class="habit-cell"><input type="checkbox" data-key="h-deep-4"></div><div class="habit-cell"><input type="checkbox" data-key="h-deep-5"></div><div class="habit-cell"><input type="checkbox" data-key="h-deep-6"></div><div class="habit-cell"><input type="checkbox" data-key="h-deep-7"></div>
+
+        <div class="habit-name"><span class="habit-dot" style="background:#8b5cf6"></span> Time-Blocked</div>
+        <div class="habit-cell"><input type="checkbox" data-key="h-tb-1"></div><div class="habit-cell"><input type="checkbox" data-key="h-tb-2"></div><div class="habit-cell"><input type="checkbox" data-key="h-tb-3"></div><div class="habit-cell"><input type="checkbox" data-key="h-tb-4"></div><div class="habit-cell"><input type="checkbox" data-key="h-tb-5"></div><div class="habit-cell"><input type="checkbox" data-key="h-tb-6"></div><div class="habit-cell"><input type="checkbox" data-key="h-tb-7"></div>
+
+        <div class="habit-name"><span class="habit-dot" style="background:#f59e0b"></span> Shutdown</div>
+        <div class="habit-cell"><input type="checkbox" data-key="h-shut-1"></div><div class="habit-cell"><input type="checkbox" data-key="h-shut-2"></div><div class="habit-cell"><input type="checkbox" data-key="h-shut-3"></div><div class="habit-cell"><input type="checkbox" data-key="h-shut-4"></div><div class="habit-cell"><input type="checkbox" data-key="h-shut-5"></div><div class="habit-cell"><input type="checkbox" data-key="h-shut-6"></div><div class="habit-cell"><input type="checkbox" data-key="h-shut-7"></div>
+
+        <div class="habit-name"><span class="habit-dot" style="background:#a855f7"></span> Contemplation</div>
+        <div class="habit-cell"><input type="checkbox" data-key="h-contemp-1"></div><div class="habit-cell"><input type="checkbox" data-key="h-contemp-2"></div><div class="habit-cell"><input type="checkbox" data-key="h-contemp-3"></div><div class="habit-cell"><input type="checkbox" data-key="h-contemp-4"></div><div class="habit-cell"><input type="checkbox" data-key="h-contemp-5"></div><div class="habit-cell"><input type="checkbox" data-key="h-contemp-6"></div><div class="habit-cell"><input type="checkbox" data-key="h-contemp-7"></div>
+
+        <div class="habit-name"><span class="habit-dot" style="background:#64748b"></span> Phone Foyer</div>
+        <div class="habit-cell"><input type="checkbox" data-key="h-phone-1"></div><div class="habit-cell"><input type="checkbox" data-key="h-phone-2"></div><div class="habit-cell"><input type="checkbox" data-key="h-phone-3"></div><div class="habit-cell"><input type="checkbox" data-key="h-phone-4"></div><div class="habit-cell"><input type="checkbox" data-key="h-phone-5"></div><div class="habit-cell"><input type="checkbox" data-key="h-phone-6"></div><div class="habit-cell"><input type="checkbox" data-key="h-phone-7"></div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- 9. SHUTDOWN RITUAL -->
-<div class="section" id="shutdown">
-  <div class="section-header" onclick="toggleSection(this)">
-    <h2>Shutdown Ritual</h2>
-    <span class="section-badge">End of Day</span>
-    <span class="section-toggle">&#9660;</span>
+<!-- ── TIME BLOCK PANEL ── -->
+<div class="panel" id="panel-timeblock">
+  <div class="panel-header">
+    <h1>Time Block</h1>
+    <p>Give every minute a job. Re-block as needed.</p>
   </div>
-  <div class="section-body">
-    <div class="quote-block" style="margin-bottom: 1.25rem;">
-      <p>"When you're done, you're done. A shutdown ritual helps your mind shift completely from work mode to non-work mode."</p>
-      <cite>— Cal Newport</cite>
+  <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; font-size: 0.72rem;">
+    <span style="display:flex;align-items:center;gap:0.25rem"><span style="width:10px;height:10px;background:rgba(0,128,128,0.12);border-radius:2px"></span> Deep</span>
+    <span style="display:flex;align-items:center;gap:0.25rem"><span style="width:10px;height:10px;background:rgba(200,180,80,0.12);border-radius:2px"></span> Shallow</span>
+  </div>
+  <div class="grid-2">
+    <div class="time-grid">
+      <div class="time-slot">6:00</div><div class="time-block"><input data-key="tb-0600" placeholder="Morning routine..."></div>
+      <div class="time-slot">6:30</div><div class="time-block"><input data-key="tb-0630"></div>
+      <div class="time-slot">7:00</div><div class="time-block"><input data-key="tb-0700"></div>
+      <div class="time-slot">7:30</div><div class="time-block"><input data-key="tb-0730"></div>
+      <div class="time-slot">8:00</div><div class="time-block deep"><input data-key="tb-0800" placeholder="Deep work 1..."></div>
+      <div class="time-slot">8:30</div><div class="time-block deep"><input data-key="tb-0830"></div>
+      <div class="time-slot">9:00</div><div class="time-block deep"><input data-key="tb-0900"></div>
+      <div class="time-slot">9:30</div><div class="time-block deep"><input data-key="tb-0930"></div>
+      <div class="time-slot">10:00</div><div class="time-block deep"><input data-key="tb-1000"></div>
+      <div class="time-slot">10:30</div><div class="time-block shallow"><input data-key="tb-1030" placeholder="Email batch..."></div>
+      <div class="time-slot">11:00</div><div class="time-block shallow"><input data-key="tb-1100"></div>
+      <div class="time-slot">11:30</div><div class="time-block deep"><input data-key="tb-1130" placeholder="Deep work 2..."></div>
+      <div class="time-slot">12:00</div><div class="time-block"><input data-key="tb-1200" placeholder="Lunch..."></div>
+    </div>
+    <div class="time-grid">
+      <div class="time-slot">12:30</div><div class="time-block"><input data-key="tb-1230"></div>
+      <div class="time-slot">1:00</div><div class="time-block deep"><input data-key="tb-1300" placeholder="Deep work 3..."></div>
+      <div class="time-slot">1:30</div><div class="time-block deep"><input data-key="tb-1330"></div>
+      <div class="time-slot">2:00</div><div class="time-block deep"><input data-key="tb-1400"></div>
+      <div class="time-slot">2:30</div><div class="time-block shallow"><input data-key="tb-1430" placeholder="Meetings..."></div>
+      <div class="time-slot">3:00</div><div class="time-block shallow"><input data-key="tb-1500"></div>
+      <div class="time-slot">3:30</div><div class="time-block shallow"><input data-key="tb-1530"></div>
+      <div class="time-slot">4:00</div><div class="time-block"><input data-key="tb-1600"></div>
+      <div class="time-slot">4:30</div><div class="time-block"><input data-key="tb-1630" placeholder="Shutdown ritual..."></div>
+      <div class="time-slot">5:00</div><div class="time-block"><input data-key="tb-1700" placeholder="Done."></div>
+      <div class="time-slot">5:30</div><div class="time-block"><input data-key="tb-1730" placeholder="Evening."></div>
+      <div class="time-slot">6:00</div><div class="time-block"><input data-key="tb-1800"></div>
+      <div class="time-slot">6:30</div><div class="time-block"><input data-key="tb-1830"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── PROJECTS PANEL ── -->
+<div class="panel" id="panel-projects">
+  <div class="panel-header">
+    <h1>Project Command</h1>
+    <p>All active projects, agents, and builds in one view.</p>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-label">Active</div><div class="kpi-value" style="color:var(--green)">10</div><div class="kpi-sub">in progress</div></div>
+    <div class="kpi"><div class="kpi-label">Complete</div><div class="kpi-value" style="color:var(--text-muted)">3</div><div class="kpi-sub">shipped</div></div>
+    <div class="kpi"><div class="kpi-label">Blocked</div><div class="kpi-value" style="color:var(--red)">2</div><div class="kpi-sub">needs attention</div></div>
+    <div class="kpi"><div class="kpi-label">Stalled</div><div class="kpi-value" style="color:var(--amber)">2</div><div class="kpi-sub">no recent activity</div></div>
+  </div>
+
+  <div class="card">
+    <table class="data-table">
+      <thead>
+        <tr><th>Project</th><th>Type</th><th>Status</th><th>Stack</th><th>Next Action</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Nielsen Bot</td><td><span class="tag tag-client">Client</span></td><td><span class="status status-active"><span class="status-dot"></span>Active</span></td><td style="font-family:var(--font-mono);font-size:0.72rem">Python, Claude API</td><td><input data-key="proj-nielsen" value="Fix hallucination + retrieval"></td></tr>
+        <tr><td>Paperclip</td><td><span class="tag tag-agent">Agent</span></td><td><span class="status status-progress"><span class="status-dot"></span>In Progress</span></td><td style="font-family:var(--font-mono);font-size:0.72rem">Node/TS, PostgreSQL</td><td><input data-key="proj-paperclip" value="Multi-agent orchestration"></td></tr>
+        <tr><td>NanoClaw</td><td><span class="tag tag-agent">Agent</span></td><td><span class="status status-active"><span class="status-dot"></span>Active</span></td><td style="font-family:var(--font-mono);font-size:0.72rem">Node/TS, SQLite, Docker</td><td><input data-key="proj-nanoclaw" value="WhatsApp + Telegram live"></td></tr>
+        <tr><td>Twitter Bookmark Agent</td><td><span class="tag tag-agent">Agent</span></td><td><span class="status status-active"><span class="status-dot"></span>Active</span></td><td style="font-family:var(--font-mono);font-size:0.72rem">Python, Lambda, Pinecone</td><td><input data-key="proj-twitter" value="RAG chatbot via Telegram"></td></tr>
+        <tr><td>Strator / MedNex</td><td><span class="tag tag-client">Client</span></td><td><span class="status status-progress"><span class="status-dot"></span>In Progress</span></td><td style="font-family:var(--font-mono);font-size:0.72rem">Python, Claude Sonnet</td><td><input data-key="proj-strator" value="Clarify role w/ Kevin"></td></tr>
+        <tr><td>Carer Liaison</td><td><span class="tag tag-agent">Agent</span></td><td><span class="status status-progress"><span class="status-dot"></span>In Progress</span></td><td style="font-family:var(--font-mono);font-size:0.72rem">Python, Claude, Obsidian</td><td><input data-key="proj-carer" value="6-agent NDIS system"></td></tr>
+        <tr><td>VoiceNote Pipeline</td><td><span class="tag tag-agent">Agent</span></td><td><span class="status status-active"><span class="status-dot"></span>Active</span></td><td style="font-family:var(--font-mono);font-size:0.72rem">Python, Deepgram</td><td><input data-key="proj-voicenote" value="Voice to Obsidian notes"></td></tr>
+        <tr><td>Video (Remotion)</td><td><span class="tag tag-product">Product</span></td><td><span class="status status-active"><span class="status-dot"></span>Active</span></td><td style="font-family:var(--font-mono);font-size:0.72rem">Next.js, Remotion</td><td><input data-key="proj-remotion" value="Prompt to motion graphics"></td></tr>
+        <tr><td>buildpersonalbranding</td><td><span class="tag tag-business">Business</span></td><td><span class="status status-blocked"><span class="status-dot"></span>Blocked</span></td><td style="font-family:var(--font-mono);font-size:0.72rem">TBD</td><td><input data-key="proj-bpb" value="10 PRD questions outstanding"></td></tr>
+        <tr><td>Personal Website</td><td><span class="tag tag-personal">Personal</span></td><td><span class="status status-complete"><span class="status-dot"></span>Complete</span></td><td style="font-family:var(--font-mono);font-size:0.72rem">HTML/CSS/JS, GH Pages</td><td><input data-key="proj-website" value="Spec locked, needs content"></td></tr>
+        <tr><td>Life Central Dashboard</td><td><span class="tag tag-personal">Personal</span></td><td><span class="status status-active"><span class="status-dot"></span>Active</span></td><td style="font-family:var(--font-mono);font-size:0.72rem">HTML/JS, Supabase</td><td><input data-key="proj-dashboard" value="v2.0 architectural redesign"></td></tr>
+        <tr><td>Claude Chat Analysis</td><td><span class="tag tag-research">Research</span></td><td><span class="status status-complete"><span class="status-dot"></span>Complete</span></td><td style="font-family:var(--font-mono);font-size:0.72rem">Python, D3.js, NLP</td><td><input data-key="proj-analysis" value="Scrollytelling done"></td></tr>
+        <tr><td>Agent Gallery</td><td><span class="tag tag-showcase">Showcase</span></td><td><span class="status status-stalled"><span class="status-dot"></span>Stalled</span></td><td style="font-family:var(--font-mono);font-size:0.72rem">Next.js, Framer Motion</td><td><input data-key="proj-gallery" value="Portfolio showcase"></td></tr>
+        <tr><td>CGG / Stella</td><td><span class="tag tag-client">Client</span></td><td><span class="status status-active"><span class="status-dot"></span>Active</span></td><td style="font-family:var(--font-mono);font-size:0.72rem">Consulting</td><td><input data-key="proj-cgg" value="Bi-weekly cadence"></td></tr>
+        <tr><td>Bridge AI FZCO</td><td><span class="tag tag-personal">Personal</span></td><td><span class="status status-blocked"><span class="status-dot"></span>Blocked</span></td><td style="font-family:var(--font-mono);font-size:0.72rem">Admin / Legal</td><td><input data-key="proj-bridge" value="FTA docs outstanding"></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── COSTS PANEL ── -->
+<div class="panel" id="panel-costs">
+  <div class="panel-header">
+    <h1>Cost Center</h1>
+    <p>Monthly spend across AI APIs and infrastructure.</p>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="kpi-label">Total Monthly</div><div class="kpi-value" id="cost-total" style="color:var(--green)">$0</div><div class="kpi-sub">all services</div></div>
+    <div class="kpi"><div class="kpi-label">AI / LLM APIs</div><div class="kpi-value" id="cost-ai">$0</div><div class="kpi-sub">Claude, OpenRouter, Deepgram</div></div>
+    <div class="kpi"><div class="kpi-label">Infrastructure</div><div class="kpi-value" id="cost-infra">$0</div><div class="kpi-sub">AWS, Pinecone, hosting</div></div>
+    <div class="kpi"><div class="kpi-label">Budget</div><div class="kpi-value" style="color:var(--teal)">$200</div><div class="kpi-sub">target ceiling</div></div>
+  </div>
+
+  <div class="card">
+    <table class="data-table">
+      <thead><tr><th>Service</th><th>Category</th><th>Used By</th><th>Pricing</th><th>Monthly Est.</th></tr></thead>
+      <tbody>
+        <tr><td>Anthropic (Claude)</td><td>AI / LLM</td><td style="font-size:0.75rem">Paperclip, NanoClaw, Nielsen, MedNex, Carer</td><td>Per-token</td><td><input data-key="cost-anthropic" class="field compact" placeholder="$0"></td></tr>
+        <tr><td>OpenRouter</td><td>AI / LLM</td><td style="font-size:0.75rem">VoiceNote Pipeline</td><td>Per-token</td><td><input data-key="cost-openrouter" class="field compact" placeholder="$0"></td></tr>
+        <tr><td>Deepgram</td><td>AI / LLM</td><td style="font-size:0.75rem">VoiceNote Pipeline</td><td>$0.0043/min</td><td><input data-key="cost-deepgram" class="field compact" placeholder="$0"></td></tr>
+        <tr><td>AWS Lambda</td><td>Infra</td><td style="font-size:0.75rem">Twitter Bookmark Agent</td><td>Pay-per-invocation</td><td><input data-key="cost-aws" class="field compact" placeholder="$0"></td></tr>
+        <tr><td>Pinecone</td><td>Infra</td><td style="font-size:0.75rem">Twitter Bookmark Agent</td><td>Free tier</td><td><input data-key="cost-pinecone" class="field compact" placeholder="$0"></td></tr>
+        <tr><td>GitHub Pages</td><td>Infra</td><td style="font-size:0.75rem">Website, Dashboard</td><td>Free</td><td><input data-key="cost-ghpages" class="field compact" placeholder="$0"></td></tr>
+        <tr><td>Supabase</td><td>Infra</td><td style="font-size:0.75rem">Life Central Dashboard</td><td>Free tier</td><td><input data-key="cost-supabase" class="field compact" placeholder="$0"></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── PLANNING PANEL ── -->
+<div class="panel" id="panel-planning">
+  <div class="panel-header">
+    <h1>Multi-Scale Planning</h1>
+    <p>Quarterly direction, weekly priorities, daily execution.</p>
+  </div>
+
+  <div class="tab-bar">
+    <div class="tab-item active" onclick="switchTab(this, 'plan-quarterly')">Quarterly</div>
+    <div class="tab-item" onclick="switchTab(this, 'plan-weekly')">Weekly</div>
+    <div class="tab-item" onclick="switchTab(this, 'plan-daily')">Daily</div>
+  </div>
+
+  <div class="tab-content active" id="plan-quarterly">
+    <div class="card">
+      <div class="card-title">Quarterly Plan</div>
+      <div class="card-subtitle">Set at the start of each quarter. You get four resets per year.</div>
+      <div class="field-group"><div class="field-label">Current Quarter</div><textarea class="field compact" data-key="quarterly-current" placeholder="Q1 2026"></textarea></div>
+      <div class="field-group"><div class="field-label">Theme / Focus</div><textarea class="field" data-key="quarterly-theme" rows="2" placeholder="What's the overarching theme?"></textarea></div>
+      <div class="grid-2">
+        <div class="field-group"><div class="field-label">Professional Goals</div><textarea class="field" data-key="quarterly-pro" rows="4" placeholder="Key projects, skill targets..."></textarea></div>
+        <div class="field-group"><div class="field-label">Personal Goals</div><textarea class="field" data-key="quarterly-personal" rows="4" placeholder="Health, relationships, leisure..."></textarea></div>
+      </div>
+      <div class="field-group"><div class="field-label">Guidelines & Constraints</div><textarea class="field" data-key="quarterly-guidelines" rows="2" placeholder="Rules for the quarter..."></textarea></div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="plan-weekly">
+    <div class="card">
+      <div class="card-title">Weekly Plan</div>
+      <div class="card-subtitle">Created Monday morning. Consult quarterly plan + calendar.</div>
+      <div class="field-group"><div class="field-label">Week of</div><textarea class="field compact" data-key="weekly-date" placeholder="March 24-28, 2026"></textarea></div>
+      <div class="field-group"><div class="field-label">Priorities (3-5)</div><textarea class="field" data-key="weekly-priorities" rows="4" placeholder="What MUST move forward this week?"></textarea></div>
+      <div class="field-group"><div class="field-label">Values Intentions</div><textarea class="field" data-key="weekly-values" rows="2" placeholder="How will I live my values this week?"></textarea></div>
+      <div class="field-group"><div class="field-label">Hard Landscape</div><textarea class="field" data-key="weekly-calendar" rows="2" placeholder="Fixed commitments, meetings, deadlines..."></textarea></div>
+      <div class="field-group"><div class="field-label">End-of-Week Review</div><textarea class="field" data-key="weekly-review" rows="2" placeholder="(Friday) What worked? What didn't?"></textarea></div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="plan-daily">
+    <div class="card">
+      <div class="card-title">Daily Plan</div>
+      <div class="card-subtitle">Consult weekly plan each morning. Create a time-blocked schedule.</div>
+      <div class="field-group"><div class="field-label">Today's Date</div><textarea class="field compact" data-key="daily-date" placeholder="Sunday, March 23, 2026"></textarea></div>
+      <div class="field-group"><div class="field-label">Top 3</div><textarea class="field" data-key="daily-top3-plan" rows="3" placeholder="1. &#10;2. &#10;3."></textarea></div>
+      <div class="field-group"><div class="field-label">Collection Column</div><textarea class="field" data-key="daily-collection-plan" rows="3" placeholder="Capture tasks and ideas throughout the day..."></textarea></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── PRODUCTIVITY PANEL ── -->
+<div class="panel" id="panel-productivity">
+  <div class="panel-header">
+    <h1>Productivity Funnel</h1>
+    <p>Capture, Configure, Control. How values become actions.</p>
+  </div>
+  <div class="grid-3">
+    <div class="card" style="border-top: 3px solid var(--teal);">
+      <div class="card-title">1. Capture</div>
+      <div class="card-subtitle">Get everything out of your head.</div>
+      <ul style="font-size:0.82rem;color:var(--text-secondary);padding-left:1rem;margin-bottom:0.5rem"><li>Master to-do list</li><li>Master calendar</li><li>WorkingMemory.txt</li><li>Collection column</li></ul>
+      <textarea class="field" data-key="funnel-capture" rows="2" placeholder="My capture tools..."></textarea>
+    </div>
+    <div class="card" style="border-top: 3px solid var(--teal);">
+      <div class="card-title">2. Configure</div>
+      <div class="card-subtitle">Organize into structured systems.</div>
+      <ul style="font-size:0.82rem;color:var(--text-secondary);padding-left:1rem;margin-bottom:0.5rem"><li>Role-based task boards</li><li>Tasks with context</li><li>Autopilot schedule</li><li>Project plans</li></ul>
+      <textarea class="field" data-key="funnel-configure" rows="2" placeholder="My configure system..."></textarea>
+    </div>
+    <div class="card" style="border-top: 3px solid var(--teal);">
+      <div class="card-title">3. Control</div>
+      <div class="card-subtitle">Multi-scale planning is the control layer.</div>
+      <ul style="font-size:0.82rem;color:var(--text-secondary);padding-left:1rem;margin-bottom:0.5rem"><li>Quarterly direction</li><li>Weekly translation</li><li>Daily execution</li><li>Shutdown closure</li></ul>
+      <textarea class="field" data-key="funnel-control" rows="2" placeholder="My control practices..."></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- ── VISION PANEL ── -->
+<div class="panel" id="panel-vision">
+  <div class="panel-header">
+    <h1>Lifestyle-Centric Vision</h1>
+    <p>Figure out the lifestyle you want, then work backward to find careers that support it.</p>
+  </div>
+  <div class="quote">
+    "Instead of trying to figure out what job you're passionate about, figure out the lifestyle you want — then work backward to find careers that can support it."
+    <cite>Cal Newport</cite>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">My Ideal Lifestyle (5-10 Year Vision)</div>
+      <div class="field-group"><div class="field-label">Morning</div><textarea class="field" data-key="vision-morning" rows="2" placeholder="What does your ideal morning look like?"></textarea></div>
+      <div class="field-group"><div class="field-label">Workday</div><textarea class="field" data-key="vision-workday" rows="2" placeholder="What kind of work? How long? With whom?"></textarea></div>
+      <div class="field-group"><div class="field-label">Evening & Relationships</div><textarea class="field" data-key="vision-evening" rows="2" placeholder="Who are you with? What does rest look like?"></textarea></div>
+      <div class="field-group"><div class="field-label">Overall Feeling</div><textarea class="field" data-key="vision-feeling" rows="2" placeholder="Calm? Creative? Free?"></textarea></div>
     </div>
     <div class="card">
-      <h3>Daily Shutdown Checklist</h3>
-      <p style="margin-bottom: 0.75rem;">Run through this 3–5 minute ritual at the end of every workday.</p>
-      <ol class="ritual-steps">
-        <li><strong>Process collection column</strong> — Review every item captured during the day.</li>
-        <li><strong>Check email inbox</strong> — Process or schedule responses.</li>
-        <li><strong>Review task boards</strong> — Scan active projects. Confirm nothing urgent is forgotten.</li>
-        <li><strong>Review calendar</strong> — Check tomorrow and next 2–3 days.</li>
-        <li><strong>Update weekly plan</strong> — Adjust if today shifted priorities.</li>
-        <li><strong>Set tomorrow's rough plan</strong> — Draft a preliminary time-block schedule.</li>
-        <li><strong>Close all work tabs and apps</strong> — Physically separate from work tools.</li>
-      </ol>
-      <div style="margin-top: 1rem; padding: 1rem; background: var(--teal-bg); border-radius: var(--radius-sm); text-align: center;">
-        <label style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer; font-size: 1rem; font-weight: 700; color: var(--teal);">
-          <input type="checkbox" data-key="shutdown-done" style="width: 20px; height: 20px; accent-color: var(--teal);">
-          SHUTDOWN COMPLETE
-        </label>
+      <div class="card-title">Career Capital Assessment</div>
+      <div class="field-group"><div class="field-label">Current Capital</div><textarea class="field" data-key="capital-current" rows="3" placeholder="Rare/valuable skills, expertise, credentials..."></textarea></div>
+      <div class="field-group"><div class="field-label">Capital I Need</div><textarea class="field" data-key="capital-needed" rows="2" placeholder="What closes the gap to vision?"></textarea></div>
+      <div class="field-group"><div class="field-label">Craftsman Focus</div><textarea class="field" data-key="capital-craft" rows="2" placeholder="What am I doing to become undeniable?"></textarea></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── DEEP LIFE STACK PANEL ── -->
+<div class="panel" id="panel-stack">
+  <div class="panel-header">
+    <h1>Deep Life Stack v2.0</h1>
+    <p>Two stages. Build capability, then cultivate depth. Revisit every 6-12 months.</p>
+  </div>
+  <div style="margin-bottom:0.75rem;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--teal)">Stage 1 — Become Capable</div>
+  <div class="stack-layers" style="margin-left:14px;margin-bottom:1.5rem">
+    <div class="stack-layer"><span class="stack-num">1</span><h4>Discipline</h4><p>Keystone habits: Body, Mind, Heart.</p><textarea class="field" data-key="stack-discipline" rows="2" placeholder="My discipline commitments..." style="margin-top:0.4rem"></textarea></div>
+    <div class="stack-layer"><span class="stack-num">2</span><h4>Control</h4><p>Multi-scale planning. Capture system. Tame obligations.</p><textarea class="field" data-key="stack-control" rows="2" placeholder="My control systems..." style="margin-top:0.4rem"></textarea></div>
+    <div class="stack-layer"><span class="stack-num">3</span><h4>Craft</h4><p>Deliberate practice in your primary craft.</p><textarea class="field" data-key="stack-craft" rows="2" placeholder="What craft am I practicing?" style="margin-top:0.4rem"></textarea></div>
+    <div class="stack-layer"><span class="stack-num">4</span><h4>Simplification</h4><p>Phone foyer method. Reduce digital noise.</p><textarea class="field" data-key="stack-simplify" rows="2" placeholder="What am I simplifying?" style="margin-top:0.4rem"></textarea></div>
+  </div>
+  <div style="margin-bottom:0.75rem;font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--teal)">Stage 2 — Cultivate Depth</div>
+  <div class="stack-layers" style="margin-left:14px">
+    <div class="stack-layer"><span class="stack-num">5</span><h4>Values & Code</h4><p>Define a personal code that guides decisions.</p><textarea class="field" data-key="stack-values" rows="2" placeholder="Core values and principles..." style="margin-top:0.4rem"></textarea></div>
+    <div class="stack-layer"><span class="stack-num">6</span><h4>Service</h4><p>Use capabilities to serve others.</p><textarea class="field" data-key="stack-service" rows="2" placeholder="How am I serving?" style="margin-top:0.4rem"></textarea></div>
+    <div class="stack-layer"><span class="stack-num">7</span><h4>Vision</h4><p>Lifestyle-centric planning. Plan for the remarkable.</p><textarea class="field" data-key="stack-vision" rows="2" placeholder="What bold move am I making?" style="margin-top:0.4rem"></textarea></div>
+  </div>
+</div>
+
+<!-- ── LIFE BUCKETS PANEL ── -->
+<div class="panel" id="panel-buckets">
+  <div class="panel-header">
+    <h1>Deep Life Buckets</h1>
+    <p>Five areas of a deep life. Test limited changes each 30-day cycle.</p>
+  </div>
+  <div class="grid-3" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+    <div class="card bucket"><div class="card-title">Constitution</div><div class="card-subtitle">Physical & mental health</div><div class="field-group"><div class="field-label">Status</div><textarea class="field" data-key="bucket-constitution-status" rows="2" placeholder="How am I doing?"></textarea></div><div class="field-group"><div class="field-label">30-Day Experiment</div><textarea class="field" data-key="bucket-constitution-exp" rows="2" placeholder="What change am I testing?"></textarea></div></div>
+    <div class="card bucket"><div class="card-title">Craft</div><div class="card-subtitle">Skill building</div><div class="field-group"><div class="field-label">Status</div><textarea class="field" data-key="bucket-craft-status" rows="2" placeholder="What am I mastering?"></textarea></div><div class="field-group"><div class="field-label">30-Day Experiment</div><textarea class="field" data-key="bucket-craft-exp" rows="2" placeholder="What experiment?"></textarea></div></div>
+    <div class="card bucket"><div class="card-title">Community</div><div class="card-subtitle">Family, friends, service</div><div class="field-group"><div class="field-label">Status</div><textarea class="field" data-key="bucket-community-status" rows="2" placeholder="Relationships?"></textarea></div><div class="field-group"><div class="field-label">30-Day Experiment</div><textarea class="field" data-key="bucket-community-exp" rows="2" placeholder="What connection?"></textarea></div></div>
+    <div class="card bucket"><div class="card-title">Contemplation</div><div class="card-subtitle">Philosophy, ethics, meaning</div><div class="field-group"><div class="field-label">Status</div><textarea class="field" data-key="bucket-contemplation-status" rows="2" placeholder="Inner life?"></textarea></div><div class="field-group"><div class="field-label">30-Day Experiment</div><textarea class="field" data-key="bucket-contemplation-exp" rows="2" placeholder="What practice?"></textarea></div></div>
+    <div class="card bucket"><div class="card-title">Celebration</div><div class="card-subtitle">Leisure, rest, fun</div><div class="field-group"><div class="field-label">Status</div><textarea class="field" data-key="bucket-celebration-status" rows="2" placeholder="Am I resting well?"></textarea></div><div class="field-group"><div class="field-label">30-Day Experiment</div><textarea class="field" data-key="bucket-celebration-exp" rows="2" placeholder="What leisure?"></textarea></div></div>
+  </div>
+</div>
+
+<!-- ── VALUES PANEL ── -->
+<div class="panel" id="panel-values">
+  <div class="panel-header">
+    <h1>Values & Personal Code</h1>
+    <p>Your ethical operating system. Review weekly.</p>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">My Personal Code</div>
+      <textarea class="field" data-key="personal-code" rows="8" placeholder="What do you believe? What principles guide your decisions?"></textarea>
+    </div>
+    <div class="card">
+      <div class="card-title">Value-Aligned Rituals</div>
+      <textarea class="field" data-key="value-rituals" rows="8" placeholder="Regular practices that connect you to your code."></textarea>
+    </div>
+  </div>
+  <div class="section-gap">
+    <div class="card">
+      <div class="card-title">Strategic Plans</div>
+      <div class="card-subtitle">Vague goals, concrete plans.</div>
+      <div class="grid-2">
+        <div class="field-group"><div class="field-label">Career Strategic Plan</div><textarea class="field" data-key="strategic-career" rows="4" placeholder="Career direction and concrete steps this quarter..."></textarea></div>
+        <div class="field-group"><div class="field-label">Personal Life Strategic Plan</div><textarea class="field" data-key="strategic-personal" rows="4" placeholder="Health, relationships, contemplation, leisure..."></textarea></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- REFERENCE -->
-<div class="section" id="reference">
-  <div class="section-header" onclick="toggleSection(this)">
-    <h2>Reference: Cal Newport's System Sources</h2>
-    <span class="section-badge">Books & Episodes</span>
-    <span class="section-toggle">&#9660;</span>
-  </div>
-  <div class="section-body">
-    <div class="grid-3">
-      <div class="card">
-        <h3>Core Books</h3>
-        <ul>
-          <li><strong>Deep Work</strong> (2016)</li>
-          <li><strong>Digital Minimalism</strong> (2019)</li>
-          <li><strong>So Good They Can't Ignore You</strong> (2012)</li>
-          <li><strong>A World Without Email</strong> (2021)</li>
-          <li><strong>Slow Productivity</strong> (2024)</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>Key Podcast Episodes</h3>
-        <ul>
-          <li><strong>Ep. 252</strong> — The Deep Life Stack</li>
-          <li><strong>Ep. 258</strong> — Godel's Deep Life Stack</li>
-          <li><strong>Ep. 274</strong> — Deep Life Stack v2.0</li>
-          <li><strong>Ep. 314</strong> — Elements of the Deep Life</li>
-          <li><strong>Ep. 324</strong> — Taming Non-Work Tasks</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>Key Concepts Index</h3>
-        <ul>
-          <li>Lifestyle-Centric Planning</li>
-          <li>Career Capital Theory</li>
-          <li>Craftsman Mindset vs. Passion Mindset</li>
-          <li>Multi-Scale Planning</li>
-          <li>Time Blocking</li>
-          <li>Capture/Configure/Control</li>
-          <li>Shutdown Ritual</li>
-          <li>Fixed-Schedule Productivity</li>
-          <li>Autopilot Schedule</li>
-          <li>Phone Foyer Method</li>
-          <li>Deep Life Buckets (5 C's)</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</div>
+</div><!-- .main -->
+</div><!-- .shell -->
 
-</div><!-- .container -->
-
-<!-- ACTION BAR -->
-<div class="action-bar">
-  <button class="action-btn secondary" onclick="handleClear()">Clear All</button>
-  <button class="action-btn secondary" onclick="handleExport()">Export JSON</button>
-  <button class="action-btn secondary" onclick="handlePrint()">Print / PDF</button>
-  <button class="action-btn primary" onclick="handleSave()">Save</button>
-</div>
 <div class="toast" id="toast"></div>
 
 <!-- SCRIPTS -->
@@ -1438,77 +1175,31 @@
 <script src="js/auth.js"></script>
 <script src="js/dashboard-data.js"></script>
 <script>
-// ═══ APP INIT ═══
-let isGuest = new URLSearchParams(window.location.search).has('guest');
+// ═══ DATE ═══
+document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-US', {
+  weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+});
 
-(async function init() {
-  let user = null;
-
-  if (!isGuest) {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        user = session.user;
-        document.getElementById('user-email').textContent = user.email;
-        document.getElementById('auth-btn').textContent = 'Sign Out';
-        document.getElementById('sync-indicator').textContent = 'SYNCED';
-        document.getElementById('sync-indicator').className = 'sync-status synced';
-      }
-    } catch (e) {
-      // Supabase not configured — run in local-only mode
-      console.info('Supabase not configured. Running in local-only mode.');
-    }
-  }
-
-  DashboardData.init(user);
-  await DashboardData.load();
-  updateHabitProgress();
-
-  // Set print timestamp
-  document.getElementById('print-ts').textContent =
-    'Printed: ' + new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-})();
-
-// ═══ AUTH ACTION ═══
-async function handleAuthAction() {
-  const btn = document.getElementById('auth-btn');
-  if (btn.textContent === 'Sign Out') {
-    try { await Auth.signOut(); } catch (e) { window.location.href = 'login.html'; }
-  } else {
-    window.location.href = 'login.html';
-  }
+// ═══ PANEL NAVIGATION ═══
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  document.querySelector(`[data-panel="${id}"]`).classList.add('active');
+  document.getElementById('main-content').scrollTo(0, 0);
 }
 
-// ═══ SECTION TOGGLE ═══
-function toggleSection(header) {
-  const body = header.nextElementSibling;
-  const toggle = header.querySelector('.section-toggle');
-  body.classList.toggle('collapsed');
-  toggle.classList.toggle('collapsed');
+// ═══ TABS ═══
+function switchTab(el, contentId) {
+  const bar = el.parentElement;
+  bar.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  const parent = bar.parentElement;
+  parent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById(contentId).classList.add('active');
 }
 
-// ═══ SCALE TABS ═══
-function switchScale(scale) {
-  document.querySelectorAll('.scale-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.scale-content').forEach(c => c.classList.remove('active'));
-  event.target.classList.add('active');
-  document.getElementById('scale-' + scale).classList.add('active');
-}
-
-// ═══ NAV ACTIVE ═══
-const navLinks = document.querySelectorAll('.nav-link');
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      navLinks.forEach(l => l.classList.remove('active'));
-      const link = document.querySelector(`.nav-link[href="#${entry.target.id}"]`);
-      if (link) link.classList.add('active');
-    }
-  });
-}, { rootMargin: '-80px 0px -60% 0px' });
-document.querySelectorAll('.section').forEach(s => observer.observe(s));
-
-// ═══ HABIT PROGRESS ═══
+// ═══ HABITS ═══
 function updateHabitProgress() {
   const boxes = document.querySelectorAll('#habit-tracker input[type="checkbox"]');
   const checked = Array.from(boxes).filter(b => b.checked).length;
@@ -1525,73 +1216,52 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 2000);
 }
 
-// ═══ ACTION HANDLERS ═══
+// ═══ ACTIONS ═══
 async function handleSave() {
   await DashboardData.save();
-  showToast('Dashboard saved');
-}
-
-async function handleClear() {
-  const cleared = await DashboardData.clearAll();
-  if (cleared) {
-    updateHabitProgress();
-    showToast('All data cleared');
-  }
+  showToast('Saved');
 }
 
 function handleExport() {
   DashboardData.exportJSON();
-  showToast('Exported to JSON');
+  showToast('Exported');
 }
 
-function handlePrint() {
-  window.print();
+// ═══ AUTH ═══
+let isGuest = new URLSearchParams(window.location.search).has('guest');
+
+async function handleAuthAction() {
+  const btn = document.getElementById('auth-btn');
+  if (btn.textContent === 'Sign Out') {
+    try { await Auth.signOut(); } catch (e) { window.location.href = 'login.html'; }
+  } else {
+    window.location.href = 'login.html';
+  }
 }
 
-// ═══ COST CALCULATIONS ═══
-function updateCostTotals() {
-  let aiTotal = 0, infraTotal = 0;
-  document.querySelectorAll('.cost-input').forEach(input => {
-    const val = parseFloat(input.value) || 0;
-    if (input.dataset.category === 'ai') aiTotal += val;
-    else if (input.dataset.category === 'infra') infraTotal += val;
-  });
-  const total = aiTotal + infraTotal;
-  document.getElementById('cost-total').textContent = '$' + total.toFixed(0);
-  document.getElementById('cost-ai').textContent = '$' + aiTotal.toFixed(0);
-  document.getElementById('cost-infra').textContent = '$' + infraTotal.toFixed(0);
+// ═══ INIT ═══
+(async function init() {
+  let user = null;
+  if (!isGuest) {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        user = session.user;
+        document.getElementById('user-email').textContent = user.email;
+        document.getElementById('auth-btn').textContent = 'Sign Out';
+        document.getElementById('sync-indicator').textContent = 'SYNCED';
+        document.getElementById('sync-indicator').className = 'topbar-sync synced';
+      }
+    } catch (e) {
+      console.info('Supabase not configured. Local mode.');
+    }
+  }
+  DashboardData.init(user);
+  await DashboardData.load();
+  updateHabitProgress();
+})();
 
-  // Color the total based on budget
-  const budgetEl = document.getElementById('cost-budget');
-  const budget = parseFloat(budgetEl.textContent.replace('$', '')) || 200;
-  const totalEl = document.getElementById('cost-total');
-  if (total > budget) totalEl.style.color = '#dc2626';
-  else if (total > budget * 0.8) totalEl.style.color = '#d97706';
-  else totalEl.style.color = '#16a34a';
-}
-
-// ═══ PROJECT STATUS COUNTS ═══
-function updateProjectCounts() {
-  const pills = document.querySelectorAll('#project-table .status-pill');
-  let active = 0, complete = 0, blocked = 0, stalled = 0;
-  pills.forEach(p => {
-    const text = p.textContent.trim();
-    if (text === 'Active') active++;
-    else if (text === 'In Progress') active++;
-    else if (text === 'Complete') complete++;
-    else if (text === 'Blocked') blocked++;
-    else if (text === 'Stalled') stalled++;
-  });
-  document.getElementById('proj-active').textContent = active;
-  document.getElementById('proj-complete').textContent = complete;
-  document.getElementById('proj-blocked').textContent = blocked;
-  document.getElementById('proj-stalled').textContent = stalled;
-}
-
-// Run on load
-setTimeout(() => { updateCostTotals(); updateProjectCounts(); }, 500);
-
-// ═══ AUTO-SAVE ON CHANGE ═══
+// ═══ AUTO-SAVE ═══
 document.addEventListener('change', (e) => {
   if (e.target.dataset?.key) {
     DashboardData.debouncedSave();
@@ -1601,8 +1271,17 @@ document.addEventListener('change', (e) => {
 document.addEventListener('input', (e) => {
   if (e.target.dataset?.key && e.target.type !== 'checkbox') {
     DashboardData.debouncedSave();
-    if (e.target.classList.contains('cost-input')) updateCostTotals();
   }
+});
+
+// ═══ KEYBOARD NAV ═══
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'p' && (e.metaKey || e.ctrlKey)) return; // allow print
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  const panels = ['today','timeblock','projects','costs','planning','productivity','vision','stack','buckets','values'];
+  const idx = panels.indexOf(document.querySelector('.panel.active')?.id.replace('panel-',''));
+  if (e.key === 'ArrowDown' && idx < panels.length - 1) { e.preventDefault(); showPanel(panels[idx + 1]); }
+  if (e.key === 'ArrowUp' && idx > 0) { e.preventDefault(); showPanel(panels[idx - 1]); }
 });
 </script>
 

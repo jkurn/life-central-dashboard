@@ -1,0 +1,30 @@
+{
+  "date": "2026-03-23",
+  "url": "https://jkurn.github.io/life-central-dashboard/",
+  "designScore": "C+",
+  "aiSlopScore": "C",
+  "categoryGrades": {
+    "hierarchy": "C",
+    "typography": "C+",
+    "color": "B+",
+    "spacing": "B",
+    "interaction": "C",
+    "responsive": "B-",
+    "content": "C+",
+    "aiSlop": "C",
+    "motion": "C-",
+    "performance": "C+"
+  },
+  "findings": [
+    { "id": "FINDING-001", "title": "Massive page length destroys dashboard utility", "impact": "high", "category": "hierarchy" },
+    { "id": "FINDING-002", "title": "Inter font not imported — falls back to Times", "impact": "high", "category": "typography" },
+    { "id": "FINDING-003", "title": "transition: all on 803 elements", "impact": "medium", "category": "motion" },
+    { "id": "FINDING-004", "title": "144 undersized touch targets", "impact": "medium", "category": "interaction" },
+    { "id": "FINDING-005", "title": "Empty textareas dominate visual weight", "impact": "medium", "category": "content" },
+    { "id": "FINDING-006", "title": "Floating action bar overlaps content on mobile", "impact": "medium", "category": "responsive" },
+    { "id": "FINDING-007", "title": "Quote blocks use colored left-border AI pattern", "impact": "polish", "category": "aiSlop" },
+    { "id": "FINDING-008", "title": "Hero badge pill pattern", "impact": "polish", "category": "aiSlop" },
+    { "id": "FINDING-009", "title": "H4 sizes inconsistent across sections", "impact": "polish", "category": "typography" },
+    { "id": "FINDING-010", "title": "No prefers-reduced-motion support", "impact": "polish", "category": "motion" }
+  ]
+}
