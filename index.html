@@ -705,6 +705,227 @@
       animation-duration: 0.01ms !important;
     }
   }
+
+  /* ═══ EMOTION REGULATION ═══ */
+  .er-compliance {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 3px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    background: #fef3c7;
+    color: #92400e;
+    user-select: none;
+  }
+  .er-compliance.done { background: #dcfce7; color: #166534; }
+  .er-compliance .er-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: currentColor;
+  }
+  .er-gate {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.72);
+    backdrop-filter: blur(6px);
+    z-index: 1000;
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2rem 1rem;
+    overflow-y: auto;
+  }
+  .er-gate.show { display: flex; }
+  .er-modal {
+    background: var(--bg-card);
+    border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    width: 100%;
+    max-width: 560px;
+    padding: 1.75rem;
+  }
+  .er-modal-header { margin-bottom: 1.25rem; }
+  .er-modal-kicker {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 0.3rem;
+  }
+  .er-modal h2 {
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+  .er-modal p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 0.3rem;
+  }
+  .er-mood-meter {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  .er-quad {
+    text-align: left;
+    padding: 0.85rem;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    font-family: inherit;
+    color: var(--text);
+  }
+  .er-quad:hover { transform: translateY(-1px); }
+  .er-quad.selected { border-color: currentColor; }
+  .er-quad-yellow { background: rgba(234,179,8,0.10); color: #a16207; }
+  .er-quad-red    { background: rgba(220,38,38,0.10); color: #b91c1c; }
+  .er-quad-green  { background: rgba(22,163,74,0.10); color: #15803d; }
+  .er-quad-blue   { background: rgba(37,99,235,0.10); color: #1d4ed8; }
+  .er-quad-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+  .er-quad-words { font-size: 0.75rem; margin-top: 0.25rem; opacity: 0.85; }
+  .er-granular { border-top: 1px solid var(--border); padding-top: 1rem; }
+  .er-subhead { font-size: 0.82rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text); }
+  .er-words { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.75rem; }
+  .er-word {
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+  }
+  .er-word:hover { border-color: var(--teal); color: var(--teal); }
+  .er-word.selected { background: var(--teal); color: white; border-color: var(--teal); }
+  .er-field-label {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--teal);
+    margin: 0.75rem 0 0.3rem;
+  }
+  .er-textarea {
+    width: 100%;
+    padding: 0.55rem 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 0.85rem;
+    color: var(--text);
+    background: var(--bg);
+    resize: vertical;
+  }
+  .er-textarea:focus {
+    outline: none;
+    border-color: var(--teal);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(0,128,128,0.08);
+  }
+  .er-range { width: 100%; accent-color: var(--teal); }
+  .er-btn {
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--bg-card);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .er-btn:hover { border-color: var(--teal); color: var(--teal); }
+  .er-btn-primary {
+    background: var(--teal);
+    border-color: var(--teal);
+    color: white;
+    margin-top: 1rem;
+  }
+  .er-btn-primary:hover { background: var(--teal-dark); color: white; }
+  .er-btn-primary:disabled { background: var(--border); border-color: var(--border); color: var(--text-muted); cursor: not-allowed; }
+  .er-footnote {
+    margin-top: 1rem;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-style: italic;
+    border-top: 1px dashed var(--border);
+    padding-top: 0.75rem;
+  }
+  .er-steps {
+    padding-left: 1.2rem;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+  }
+  .er-steps li { margin: 0.3rem 0; }
+  .er-breath { display: flex; align-items: center; gap: 0.75rem; margin: 0.5rem 0 0.25rem; }
+  .er-breath-ring {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    border: 3px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+  }
+  .er-breath-ring.running { border-color: var(--teal); animation: er-pulse 4s ease-in-out infinite; }
+  .er-breath-ring.done { border-color: var(--green); color: var(--green); }
+  @keyframes er-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+  }
+  .er-muted { font-size: 0.75rem; color: var(--text-muted); }
+  .er-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1.25rem; }
+  .er-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.82rem;
+  }
+  .er-row:last-child { border-bottom: none; }
+  .er-row-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    min-width: 70px;
+  }
+  .er-chip {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+  .er-chip-yellow { background: rgba(234,179,8,0.15); color: #a16207; }
+  .er-chip-red    { background: rgba(220,38,38,0.15); color: #b91c1c; }
+  .er-chip-green  { background: rgba(22,163,74,0.15); color: #15803d; }
+  .er-chip-blue   { background: rgba(37,99,235,0.15); color: #1d4ed8; }
+  .er-vocab { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 1rem; }
+  .er-vocab-item { font-size: 0.82rem; color: var(--text-secondary); }
+  .er-reflection > div { font-size: 0.82rem; color: var(--text-secondary); margin: 0.25rem 0; }
+  .er-moment { padding: 0.6rem 0; border-bottom: 1px solid var(--border); font-size: 0.82rem; color: var(--text-secondary); }
+  .er-moment:last-child { border-bottom: none; }
+  @media (max-width: 560px) {
+    .er-mood-meter { grid-template-columns: 1fr; }
+    .er-kpis { grid-template-columns: 1fr; }
+    .er-vocab { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
@@ -716,6 +937,7 @@
   <span class="topbar-brand">Life Central</span>
   <span class="topbar-date" id="today-date"></span>
   <span class="topbar-spacer"></span>
+  <span class="er-compliance" id="er-compliance" title="Emotion regulation compliance — click to open"><span class="er-dot"></span>REGULATE 0/4</span>
   <span class="topbar-sync local" id="sync-indicator">LOCAL</span>
   <span class="topbar-user" id="user-email"></span>
   <a href="#" class="topbar-btn" id="auth-btn" onclick="handleAuthAction()">Sign In</a>
@@ -730,6 +952,9 @@
     </div>
     <div class="sidebar-item" onclick="showPanel('timeblock')" data-panel="timeblock">
       <span class="icon">&#9637;</span> Time Block
+    </div>
+    <div class="sidebar-item" onclick="showPanel('regulate')" data-panel="regulate">
+      <span class="icon">&#9825;</span> Regulate
     </div>
   </div>
 
@@ -879,6 +1104,15 @@
       </div>
     </div>
   </div>
+</div>
+
+<!-- ── REGULATE PANEL ── -->
+<div class="panel" id="panel-regulate">
+  <div class="panel-header">
+    <h1>Regulate</h1>
+    <p>Brackett's framework, operationalized. Check in three times a day. Meta-Moment when red. Reflect at night. No skipping — that's the point.</p>
+  </div>
+  <div id="er-panel-body"><!-- rendered by js/emotion-regulation.js --></div>
 </div>
 
 <!-- ── TIME BLOCK PANEL ── -->
@@ -1169,11 +1403,16 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- Emotion regulation: hidden state field (persists through DashboardData) + gate overlay -->
+<textarea id="er-state" data-key="er-state" hidden></textarea>
+<div class="er-gate" id="er-gate" aria-live="polite"></div>
+
 <!-- SCRIPTS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/config.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/dashboard-data.js"></script>
+<script src="js/emotion-regulation.js"></script>
 <script>
 // ═══ DATE ═══
 document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-US', {
@@ -1259,6 +1498,7 @@ async function handleAuthAction() {
   DashboardData.init(user);
   await DashboardData.load();
   updateHabitProgress();
+  EmotionRegulation.boot();
 })();
 
 // ═══ AUTO-SAVE ═══
@@ -1278,7 +1518,7 @@ document.addEventListener('input', (e) => {
 document.addEventListener('keydown', (e) => {
   if (e.key === 'p' && (e.metaKey || e.ctrlKey)) return; // allow print
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-  const panels = ['today','timeblock','projects','costs','planning','productivity','vision','stack','buckets','values'];
+  const panels = ['today','timeblock','regulate','projects','costs','planning','productivity','vision','stack','buckets','values'];
   const idx = panels.indexOf(document.querySelector('.panel.active')?.id.replace('panel-',''));
   if (e.key === 'ArrowDown' && idx < panels.length - 1) { e.preventDefault(); showPanel(panels[idx + 1]); }
   if (e.key === 'ArrowUp' && idx > 0) { e.preventDefault(); showPanel(panels[idx - 1]); }

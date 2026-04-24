@@ -1,0 +1,44 @@
+# ══════════════════════════════════════════════════════════
+# BACKPRESSURE — deterministic signal on every push / PR.
+#
+# Philosophy (Aidan Morgan): human review is too slow. Create a
+# binary pass/fail signal the LLM (or human) can react to quickly.
+# ══════════════════════════════════════════════════════════
+
+name: Backpressure
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  semgrep:
+    name: semgrep (static rules)
+    runs-on: ubuntu-latest
+    container:
+      image: returntocorp/semgrep
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run semgrep
+        run: semgrep --config .semgrep.yml --error --strict .
+
+  js-syntax:
+    name: js syntax check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Parse every JS file
+        run: |
+          set -e
+          for f in js/*.js; do
+            echo "=== $f ==="
+            node --check "$f"
+          done

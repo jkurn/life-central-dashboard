@@ -1,0 +1,42 @@
+# ══════════════════════════════════════════════════════════
+# SEMGREP — deterministic backpressure for this repo.
+#
+# Per Aidan Morgan ("Stop building software like it's April 2026"):
+#   Don't prompt the LLM to follow good practices — enforce them.
+#   Rules must be binary: pass or fail.
+#
+# Keep this file boring. Add rules only when a real bug slips past.
+# ══════════════════════════════════════════════════════════
+
+rules:
+  - id: no-eval
+    message: "eval() is forbidden."
+    severity: ERROR
+    languages: [javascript]
+    pattern: eval(...)
+
+  - id: no-document-write
+    message: "document.write breaks the page after load. Use DOM APIs."
+    severity: ERROR
+    languages: [javascript]
+    pattern: document.write(...)
+
+  - id: no-console-log-in-prod
+    message: "console.log left in committed code. Use console.warn/info for real diagnostics or remove."
+    severity: WARNING
+    languages: [javascript]
+    pattern: console.log(...)
+
+  - id: no-alert
+    message: "alert() / confirm() / prompt() are jarring. Use the toast helper or an in-panel modal."
+    severity: WARNING
+    languages: [javascript]
+    pattern-either:
+      - pattern: alert(...)
+      - pattern: prompt(...)
+
+  - id: no-hardcoded-jwt
+    message: "Committed JWT-shaped secret. Use a placeholder in js/config.js and document in README."
+    severity: ERROR
+    languages: [javascript]
+    pattern-regex: 'eyJ[A-Za-z0-9_-]{16,}\.[A-Za-z0-9_-]{16,}\.[A-Za-z0-9_-]{16,}'
